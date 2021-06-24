@@ -1,0 +1,26 @@
+# SuperLog configuration for Minecraft Utopia
+# Logs player movement, including line of sight.
+# Version: 1
+save-delay: 300
+date-format: "yyyy-MM-dd'T'HH:mm:ss'Z'"
+logs-format: '{DAY}-{MONTH}-{YEAR}_{TYPE}.log'
+logs-live-format: '&7&o[{TIME}][{EVENT}]{LOG}'
+logs-in-console: true
+logs-in-game: false
+gzip-logs-after: 2
+delete-logs:
+  after: 7
+  even-gzipped: false
+check-update: true
+commands-alert:
+  list: 
+    - '/gamemode'
+    - '/god'
+  message: '&7&l{PLAYER}&7 used: &e{COMMAND}'
+messages:
+  prefix: '&3&l[&e&lLOG&3&l] '
+  noperm: '&cYou do not have permission.'
+events:
+  PlayerMoveEvent:
+    enabled: true
+    message: '"player": "{NAME}", "location": [{TO.LOCX}, {TO.LOCY}, {TO.LOCZ}]'
