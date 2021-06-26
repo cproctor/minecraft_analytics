@@ -24,7 +24,9 @@ help on a specific task.
 
 Here's an example of basic usage. In the example below, we sync log files to the
 local machine, then resample events by grouping all events per minute, and then
-find the player's mean position for each minute.
+find the player's mean location for each minute. (`NaN` stands for "not a
+number"; these values are for periods in which there were no logged events and
+it was therefore impossible to calculate a mean.)
 
 ```
 $ inv sync --world logtest --interact
