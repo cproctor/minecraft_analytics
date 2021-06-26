@@ -1,0 +1,7 @@
+minecraft_server:
+  url: "192.81.211.221"
+  username: chris
+  mscs_dir: "/opt/mscs"
+local:
+  logs_path: "data/logs"
+  dataframe_path: "data/df"
