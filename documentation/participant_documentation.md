@@ -2,29 +2,18 @@
 
 The following steps will help you get set up for Minecraft Utopia.
 
+
 ## Set up instructions
 
-### Connecting to an Online Server**
 
-#### Minecraft: Java Edition
+### Connecting to an Online Server
 
-> *Note: To access a server you need to a version of Minecraft that is at least 1.16. For more information, see [Changing game version](https://help.minecraft.net/hc/en-us/articles/360034754852-Changing-game-versions-).*
-`The Minecraft Utopia server runs on 1.16.5`. To join the server, your client will need to be updated to at least a version that is 1.16, though 1.16.5 is ideal.
-*You'll be able to connect with a client updated to 1.17, though none of the new features will be present.*
-
-
-##### Connect to the Server
-
-1. Log into Minecraft and click "Multiplayer" on the main menu.  
-
-2. Click "Add Server" and enter the IP or web address of the server.
-
-      **Server Name:** Minecraft Utopia
-
-      **Server Address:** 192.81.211.221:25566
-
-![See Example](https://user-images.githubusercontent.com/54556405/123692677-1b662280-d825-11eb-892b-c5c1bfa692df.png?raw=true)
-
+If you don't know which version of Minecraft you own, you can find out from one or all of the following:
+- If you're on anything but a computer or laptop (i.e. tablet, phone, console), it's **Bedrock Edition**.
+- If you're on a computer or laptop, login to the game and on the homescreen check where the version number is:
+     - On **Bedrock Edition**, it's on the bottom-right.
+     - On **Java Edition**, it's on the bottom-left.
+- If you see your character on the right, and a "Marketplace" button, it's **Bedrock Edition**. 
 
 
 #### Minecraft: Bedrock Edition
@@ -47,6 +36,24 @@ The following steps will help you get set up for Minecraft Utopia.
 ![See Example](https://user-images.githubusercontent.com/54556405/123692297-a7c41580-d824-11eb-9af2-da2efdd33a1a.PNG?raw=true)
 
 
+#### Minecraft: Java Edition
+
+> *Note: To access a server you need to a version of Minecraft that is at least 1.16. For more information, see [Changing game version](https://help.minecraft.net/hc/en-us/articles/360034754852-Changing-game-versions-).*
+`The Minecraft Utopia server runs on 1.16.5`. To join the server, your client will need to be updated to at least a version that is 1.16, though 1.16.5 is ideal.
+*You'll be able to connect with a client updated to 1.17, though none of the new features will be present.*
+
+
+##### Connect to the Server
+
+1. Log into Minecraft and click "Multiplayer" on the main menu.  
+
+2. Click "Add Server" and enter the IP or web address of the server.
+
+      **Server Name:** Minecraft Utopia
+
+      **Server Address:** 192.81.211.221:25566
+
+![See Example](https://user-images.githubusercontent.com/54556405/123692677-1b662280-d825-11eb-892b-c5c1bfa692df.png?raw=true)
 
 
 ## About this server
