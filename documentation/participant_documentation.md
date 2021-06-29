@@ -4,14 +4,12 @@ The following steps will help you get set up for Minecraft Utopia.
 
 ## Set up instructions
 
-TODO: how to install Minecraft??? Is this necessary?
-
 ### Connecting to an Online Server**
 
 #### Minecraft: Java Edition
 
-> *Note: To access a server you need to run the same version of Minecraft as the server. For more information, see [Changing game version](https://help.minecraft.net/hc/en-us/articles/360034754852-Changing-game-versions-).*
-`The Minecraft Utopia server runs on 1.16.5`. To join the server, your client will need to be updated to at least that version.
+> *Note: To access a server you need to a version of Minecraft that is at least 1.16. For more information, see [Changing game version](https://help.minecraft.net/hc/en-us/articles/360034754852-Changing-game-versions-).*
+`The Minecraft Utopia server runs on 1.16.5`. To join the server, your client will need to be updated to at least a version that is 1.16, though 1.16.5 is ideal.
 *You'll be able to connect with a client updated to 1.17, though none of the new features will be present.*
 
 
@@ -19,7 +17,7 @@ TODO: how to install Minecraft??? Is this necessary?
 
 1. Log into Minecraft and click "Multiplayer" on the main menu.  
 
-2. Click Add Server and enter the IP or web address of the server.
+2. Click "Add Server" and enter the IP or web address of the server.
 
       **Server Name:** Minecraft Utopia
 
@@ -33,8 +31,12 @@ TODO: how to install Minecraft??? Is this necessary?
 
 1. Log into Minecraft and click "Play" on the main menu.
 2. Click "Servers" from the tabs on the top.
-3. Scroll down past the "Featured Servers", to reach "Additional Servers".
-4. Click "Add Server", and enter:
+![See Example](https://user-images.githubusercontent.com/56898088/123838480-0ac3b400-d8da-11eb-98ba-df1838f1f8ac.png)
+
+4. Scroll down past the "Featured Servers", to reach "Additional Servers".
+![See Examples](https://user-images.githubusercontent.com/56898088/123838581-229b3800-d8da-11eb-9e0a-6a1d0e80ec9b.png)
+
+5. Click "Add Server", and enter:
 
       **Server Name:** Minecraft Utopia
 
