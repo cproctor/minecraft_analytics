@@ -1,15 +1,15 @@
 # SuperLog configuration for Minecraft Utopia
 # Logs player movement, including line of sight.
-# Version: 1
+# Version: 2
 save-delay: 3
 date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSS"
 logs-format: '{YEAR}-{MONTH}-{DAY}_{TYPE}.log'
-logs-live-format: '&7&o[{TIME}][{EVENT}]{LOG}'
+logs-live-format: '&7&o[{TIME}][{EVENT}] {LOG}'
 logs-in-console: true
 logs-in-game: false
 gzip-logs-after: 2
 delete-logs:
-  after: 7
+  after: 365
   even-gzipped: false
 check-update: true
 commands-alert:
@@ -23,10 +23,28 @@ messages:
 events:
   PlayerMoveEvent:
     enabled: true
-    message: '"player": "{PLAYER}", "location": [{TO.LOCX}, {TO.LOCY}, {TO.LOCZ}], "eye_location": {EYELOC}, "eye_direction": {EYEDIR}, "target_block": {TARGETBLOCK}'
+    message: '"player": "{NAME}", "location": [{TO.LOCX}, {TO.LOCY}, {TO.LOCZ}], "eye_location": {EYELOC}, "eye_direction": {EYEDIR}, "target_block": {TARGETBLOCK}'
   BlockBreakEvent:
     enabled: true
     message: '"player": "{PLAYER.NAME}", "block": "{NAME}", "location": [{LOCX}, {LOCY}, {LOCZ}]'
   BlockPlaceEvent:
     enabled: true
     message: '"player": "{PLAYER.NAME}", "block": "{NAME}", "location": [{LOCX}, {LOCY}, {LOCZ}]'
+  PlayerJoinEvent:
+    enabled: true
+    message: '"player": "{NAME}"'
+  PlayerQuitEvent:
+    enabled: true
+    message: '"player": "{NAME}"'
+  PlayerGameModeChangeEvent:
+    enabled: true
+    message: '"player": "{NAME}", "gamemode": "{NEWGAMEMODE}"'
+  PlayerCommandPreprocessEvent:
+    enabled: true
+    message: '"player": "{NAME}", "command": "{MESSAGE}"'
+  PlayerRespawnEvent:
+    enabled: true
+    message: '"player": "{NAME}", "location": [{RESPAWNLOCATION.LOCX}, {RESPAWNLOCATION.LOCY}, {RESPAWNLOCATION.LOCZ}], "bedspawn": "{ISBEDSPAWN}"'
+  SignChangeEvent:
+    enabled: true
+    message: '"player": "{PLAYER.NAME}", "location": [{PLAYER.LOCX}, {PLAYER.LOCY}, {PLAYER.LOCZ}]'
