@@ -26,10 +26,10 @@ events:
     message: '"player": "{NAME}", "location": [{TO.LOCX}, {TO.LOCY}, {TO.LOCZ}], "eye_location": {EYELOC}, "eye_direction": {EYEDIR}, "target_block": {TARGETBLOCK}'
   BlockBreakEvent:
     enabled: true
-    message: '"player": "{PLAYER.NAME}", "block": "{NAME}", "location": [{LOCX}, {LOCY}, {LOCZ}]'
+    message: '"player": "{PLAYER}", "block": "{NAME}", "location": [{LOCX}, {LOCY}, {LOCZ}]'
   BlockPlaceEvent:
     enabled: true
-    message: '"player": "{PLAYER.NAME}", "block": "{NAME}", "location": [{LOCX}, {LOCY}, {LOCZ}]'
+    message: '"player": "{PLAYER}", "block": "{NAME}", "location": [{LOCX}, {LOCY}, {LOCZ}]'
   PlayerJoinEvent:
     enabled: true
     message: '"player": "{NAME}"'
@@ -47,4 +47,4 @@ events:
     message: '"player": "{NAME}", "location": [{RESPAWNLOCATION.LOCX}, {RESPAWNLOCATION.LOCY}, {RESPAWNLOCATION.LOCZ}], "bedspawn": "{ISBEDSPAWN}"'
   SignChangeEvent:
     enabled: true
-    message: '"player": "{PLAYER.NAME}", "location": [{PLAYER.LOCX}, {PLAYER.LOCY}, {PLAYER.LOCZ}]'
+    message: '"player": "{PLAYER}", "location": [{LOCX}, {LOCY}, {LOCZ}]'
