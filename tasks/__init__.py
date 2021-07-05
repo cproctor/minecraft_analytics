@@ -2,6 +2,7 @@ from invoke import task
 from pathlib import Path
 import code
 import sys
+import yaml
 import pandas as pd
 
 sys.path.append("lib")
@@ -48,6 +49,7 @@ def sync(c, world, minecraft_username=None, dataframe=True, interact=False):
     "minecraft_username": "optional: sync one user's data",
 })
 def interact(c, world, minecraft_username=None):
+    "Drop into interactive console with the selected dataframe loaded"
     if minecraft_username:
         df_fn = world + "_" + minecraft_username + ".csv"
     else:
@@ -57,4 +59,3 @@ def interact(c, world, minecraft_username=None):
             index_col="timestamp", parse_dates=["timestamp"])
     print("Synced dataframe is bound to `df`")
     code.interact(local=locals())
-

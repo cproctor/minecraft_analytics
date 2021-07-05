@@ -14,7 +14,8 @@ class LogReader:
 
         [2021-06-26T13:37:26.0801][PlayerMoveEvent]: "player": "thispettypace", "location": [33, 71, 99], "eye_location": [33, 71, 98], "eye_direction": [45.60006, 129.45012], "target_block": [32, 71, 98]
     """
-    log_line_pattern = "^\[(?P<timestamp>.+)\]\[(?P<event>.+)\]: (?P<data>.*)$"
+    log_line_pattern = "^\[(?P<timestamp>.+?)\]\[(?P<event>.+?)\](\[Cancelled\])?: (?P<data>.*)$"
+    command_pattern = '"command":\s*(".*")'
     log_timestamp_format = "%Y-%m-%dT%H:%M:%S.%f"
     streams = None
 
@@ -70,10 +71,17 @@ class LogReader:
             json_string = '{' + match.group('data') + '}'
             json_string = json_string.replace('Unknown', 'null')
             data = json.loads(json_string)
-            ts = datetime.strptime(match.group('timestamp'), self.log_timestamp_format)
         except json.decoder.JSONDecodeError as e:
-            raise self.ParseError("Error decoding data at {}: {}. JSON error: {}".format(
-                    loc, line, e))
+            # Maybe there was unescaped content in the command field?
+            command_match = re.search(self.command_pattern, json_string)
+            if command_match:
+                command_value = command_match.group(1)
+                json_string = json_string.replace(command_value, json.dumps(command_value))
+                data = json.loads(json_string)
+            else:
+                raise self.ParseError("Error decoding data at {}. JSON error: {}. Line:\n{}".format(loc, e, line))
+        try:
+            ts = datetime.strptime(match.group('timestamp'), self.log_timestamp_format)
         except ValueError:
             raise self.ParseError("Could not parse timestamp at {}: {}".format(
                     loc, match.group('timestamp')))
