@@ -19,10 +19,11 @@ class LogReader:
     log_timestamp_format = "%Y-%m-%dT%H:%M:%S.%f"
     streams = None
 
-    def __init__(self, logs_path, log_suffix=".log"):
+    def __init__(self, logs_path, log_suffix=".log", player_name=None):
         """Logspath should be a single file or a directory. If `logs_path` is a
         directory, all files ending in `log_suffix` will be parsed. 
         """
+        self.player_name = player_name
         logs_path = Path(logs_path)
         if not logs_path.exists():
             raise ValueError("logs_path {} does not exist".format(logs_path))
@@ -59,6 +60,14 @@ class LogReader:
                 df = df.drop(columns=oldcol)
         return df
 
+    def get_player_name(self, logfile):
+        """Tries to parse the player name from the filepath of the log file.
+        This can succeed when the log file's path is like .../players/name/BlockEvents.log
+        """
+        parts = logfile.parts
+        if len(parts) >= 3 and parts[-3] == 'players':
+            return parts[-2]
+
     def parse_line(self, line, linenum, path):
         """Tries to parse a line.
         Raises LogReader.ParseError if there's trouble.
@@ -87,6 +96,9 @@ class LogReader:
                     loc, match.group('timestamp')))
         data["timestamp"] = ts
         data["event"] = match.group('event')
+        player = self.player_name or self.get_player_name(path)
+        if player:
+            data["player"] = player
         return data
 
     class ParseError(Exception):
