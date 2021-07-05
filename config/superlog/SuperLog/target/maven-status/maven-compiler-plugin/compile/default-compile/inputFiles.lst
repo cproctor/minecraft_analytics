@@ -1,0 +1,14 @@
+/Users/chrisp/Repos/MinecraftUtopia/SuperLog/src/main/java/fr/andross/superlog/log/LogConfig.java
+/Users/chrisp/Repos/MinecraftUtopia/SuperLog/src/main/java/fr/andross/superlog/log/LogManager.java
+/Users/chrisp/Repos/MinecraftUtopia/SuperLog/src/main/java/fr/andross/superlog/commands/Commandlive.java
+/Users/chrisp/Repos/MinecraftUtopia/SuperLog/src/main/java/fr/andross/superlog/commands/Commandfilter.java
+/Users/chrisp/Repos/MinecraftUtopia/SuperLog/src/main/java/fr/andross/superlog/utils/metrics/Metrics.java
+/Users/chrisp/Repos/MinecraftUtopia/SuperLog/src/main/java/fr/andross/superlog/SuperLog.java
+/Users/chrisp/Repos/MinecraftUtopia/SuperLog/src/main/java/fr/andross/superlog/commands/Commandsave.java
+/Users/chrisp/Repos/MinecraftUtopia/SuperLog/src/main/java/fr/andross/superlog/commands/Commandtoggle.java
+/Users/chrisp/Repos/MinecraftUtopia/SuperLog/src/main/java/fr/andross/superlog/utils/LoggedEvent.java
+/Users/chrisp/Repos/MinecraftUtopia/SuperLog/src/main/java/fr/andross/superlog/commands/ICommand.java
+/Users/chrisp/Repos/MinecraftUtopia/SuperLog/src/main/java/fr/andross/superlog/utils/Utils.java
+/Users/chrisp/Repos/MinecraftUtopia/SuperLog/src/main/java/fr/andross/superlog/log/LogUtils.java
+/Users/chrisp/Repos/MinecraftUtopia/SuperLog/src/main/java/fr/andross/superlog/log/LogSerializer.java
+/Users/chrisp/Repos/MinecraftUtopia/SuperLog/src/main/java/fr/andross/superlog/commands/Commanddebug.java
