@@ -5,6 +5,17 @@ Utopia research project.
 
 ## Installation
 
+This repository has a submodule, the [data repo](https://github.com/cproctor/minecraft-utopia-data). 
+When you clone this repo, use `--recurse-submodules` to also check out the
+submodule. If you already have this repo cloned, you can initialize and fetch
+the submodule with the following commands:
+
+```
+$ cd data
+$ git submodule init
+$ git submodule update
+```
+
 *Minecraft Analytics* uses [poetry](https://python-poetry.org/) for dependency
 management. After installing poetry, run `poetry install` to install
 dependencies and then run `poetry shell` to enter a shell with
