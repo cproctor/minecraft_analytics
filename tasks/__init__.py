@@ -7,7 +7,7 @@ import pandas as pd
 
 sys.path.append("lib")
 
-from log_reader import LogReader
+from lib.log_reader import LogReader
 
 @task(help={
     "world": "name of world",
