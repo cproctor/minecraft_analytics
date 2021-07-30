@@ -8,6 +8,7 @@ import pandas as pd
 sys.path.append("lib")
 
 from logs.reader import LogReader
+from segment import Segment
 
 @task(help={
     "world": "name of world",
@@ -59,3 +60,17 @@ def interact(c, world, minecraft_username=None):
             index_col="timestamp", parse_dates=["timestamp"])
     print("Synced dataframe is bound to `df`")
     code.interact(local=locals())
+
+@task
+def export_segment(c, params_file, dryrun=False):
+    "Export a segment as speficied by a params file"
+    pf = Path(params_file)
+    if not pf.exists():
+        raise ValueError("{} does not exist".format(pf))
+    params = yaml.safe_load(pf.read_text())
+    segment = Segment(yaml.safe_load())
+    segment.validate()
+    segment.export()
+
+
+
