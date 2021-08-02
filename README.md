@@ -55,3 +55,22 @@ timestamp
 2021-06-26 20:34:00   34.492823   67.470494  202.722488
 2021-06-26 20:35:00   49.631313   65.315657  218.717172
 ```
+
+## Architecture
+
+The top-level directories in this repo are:
+
+- **analysis**: Code for producing specific analyses. Most of the work should be
+  done by code imported from `lib`.
+- **data**: The [Minecraft Utopia submodule](https://github.com/cproctor/minecraft-utopia-data). 
+  All personally-identifiable information (including downstream analysis
+  products which have not been de-identified) must be contained within this
+  repo.
+- **export**: Location to store reproducible results of analysis, such as
+  figures and tables. Not part of the repo, but will be created as needed.
+- **participants**: Documents meant for participants, such as set-up instructions
+- **lib**: All generalizable source code lives here. 
+- **server**: Code meant for deployment on the server, such as configuration files
+- **tasks**: Definitions of [invoke](http://www.pyinvoke.org/) tasks, this package's
+  high-level API.
+- **tutorial**: Space for stuff meant for team members' learning.

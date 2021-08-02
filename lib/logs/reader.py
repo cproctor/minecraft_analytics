@@ -4,6 +4,7 @@ import re
 from datetime import datetime
 import pandas as pd
 import code
+import gzip
 
 class LogReader:
     """
@@ -17,18 +18,21 @@ class LogReader:
     log_line_pattern = "^\[(?P<timestamp>.+?)\]\[(?P<event>.+?)\](\[Cancelled\])?: (?P<data>.*)$"
     command_pattern = '"command":\s*(".*")'
     log_timestamp_format = "%Y-%m-%dT%H:%M:%S.%f"
+    log_suffix = ".log"
+    compressed_log_suffix = ".gz"
     streams = None
 
-    def __init__(self, logs_path, log_suffix=".log", player_name=None):
+    def __init__(self, logs_path, player_name=None):
         """Logspath should be a single file or a directory. If `logs_path` is a
-        directory, all files ending in `log_suffix` will be parsed. 
+        directory, all files ending in '.log' or '.gz will be parsed.
         """
         self.player_name = player_name
         logs_path = Path(logs_path)
         if not logs_path.exists():
             raise ValueError("logs_path {} does not exist".format(logs_path))
         if logs_path.is_dir():
-            self.log_files = list(logs_path.glob("**/*" + log_suffix))
+            glob_pattern = "**/*[{}][{}]".format(self.log_suffix, self.compressed_log_suffix)
+            self.log_files = list(logs_path.glob(glob_pattern))
         else:
             self.log_files = logs_path
         if len(self.log_files) == 0:
@@ -43,7 +47,11 @@ class LogReader:
         """
         logs = []
         for f in self.log_files:
-            with open(f) as fh:
+            if f.suffix == self.compressed_log_suffix:
+                opener = lambda f: gzip.open(f, 'rt')
+            else:
+                opener = open
+            with opener(f) as fh:
                 for linenum, line in enumerate(fh):
                     logs.append(self.parse_line(line, linenum+1, f))
         df = pd.DataFrame.from_records(logs, index="timestamp")

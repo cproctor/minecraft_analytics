@@ -1,3 +1,5 @@
+# Functions related to analysis of collaboration between players
+
 import pandas as pd
 
 
