@@ -25,8 +25,8 @@ def dist(player_moves, player_0, player_0_location, player_1, player_1_location)
         player_1_location[2] = player_moves['location_z']
     if ((None not in player_0_location) and (None not in player_1_location)):
         distance = (((player_0_location[0] - player_1_location[0]) ** 2) + (
-                    (player_0_location[1] - player_1_location[1]) ** 2) + (
-                                (player_0_location[2] - player_1_location[2]) ** 2)) ** 0.5
+                (player_0_location[1] - player_1_location[1]) ** 2) + (
+                            (player_0_location[2] - player_1_location[2]) ** 2)) ** 0.5
         return distance
 
 
@@ -37,3 +37,14 @@ def player_distance(df, player_0, player_1):
     player_moves['dist'] = player_moves.apply(
         lambda x: dist(x, player_0, player_0_location, player_1, player_1_location), axis=1)
     return player_moves
+
+
+def main():
+    filename = '../data/df/production.csv'
+    dataframe = pd.read_csv(filename)
+
+    print(dataframe)
+
+
+if __name__ == '__main__':
+    main()
