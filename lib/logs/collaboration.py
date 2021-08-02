@@ -27,14 +27,3 @@ def player_distance(df, player_0, player_1):
     player_moves['dist'] = player_moves.apply(
         lambda x: dist(x, player_0, player_0_location, player_1, player_1_location), axis=1)
     return player_moves
-
-
-def main():
-    filename = '../data/df/production.csv'
-    dataframe = pd.read_csv(filename)
-
-    print(dataframe)
-
-
-if __name__ == '__main__':
-    main()
