@@ -2,6 +2,7 @@
 
 import pandas as pd
 import ffmpy
+import sys
 
 
 def filter_df(df, start_time, stop_time, players, events):
@@ -29,7 +30,7 @@ def slice_excerpt(input_filepath, start_time, length, label):
     output_filepath = output[0] + '_' + label + '.' + output[1]
 
     # find the location of ffmpeg.exe on your machine and edit this variable to match
-    ffmpeg_executable = ''
+    ffmpeg_executable = 'C:\\Users\\ikond\\AppData\\Roaming\\.minecraft\\ffmpeg-4.4-essentials_build\\bin\\ffmpeg.exe'
 
     # constructs the ffmpeg command
     ff = ffmpy.FFmpeg(
@@ -41,5 +42,5 @@ def slice_excerpt(input_filepath, start_time, length, label):
     try:
         ff.run()
     except ffmpy.FFRuntimeError:
-        print("The label " + label + " is already taken for this file.")
-        print("Please choose something else or delete " + output_filepath + ".")
+        sys.stderr.write("The label " + label + " is already taken for this file.")
+        sys.stderr.write(" Please choose something else or delete " + output_filepath + ".")
