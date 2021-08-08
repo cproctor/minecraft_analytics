@@ -7,8 +7,8 @@ import pandas as pd
 
 sys.path.append("lib")
 
-from logs.reader import LogReader
-from segment import Segment
+from lib.logs.reader import LogReader
+from lib.segment import Segment
 
 @task(help={
     "world": "name of world",
