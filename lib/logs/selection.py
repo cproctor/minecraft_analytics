@@ -17,6 +17,7 @@ def filter_df(df, start_time, stop_time, players, events):
     return new
 
 
+# creates an excerpt of a file at the given timestamp
 # start/length time format: HH:MM:SS.xxx
 def slice_excerpt(input_filepath, start_time, length, label):
     # get the name of the file minus the path
@@ -37,4 +38,8 @@ def slice_excerpt(input_filepath, start_time, length, label):
         outputs={output_filepath: '-t ' + length + ' -c copy'}
     )
 
-    ff.run()
+    try:
+        ff.run()
+    except ffmpy.FFRuntimeError:
+        print("The label " + label + " is already taken for this file.")
+        print("Please choose something else or delete " + output_filepath + ".")
