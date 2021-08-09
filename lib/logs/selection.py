@@ -27,7 +27,7 @@ def slice_excerpt(input_filepath, start_time, length, label):
     # get the name of the file separated from the extension
     output = input_filename.split('.')
     # create a new file path with a descriptive label
-    output_filepath = output[0] + '_' + label + '.' + output[1]
+    output_filepath = "excerpts/" + output[0] + '_' + label + '.' + output[1]
 
     # find the location of ffmpeg.exe on your machine and edit this variable to match
     ffmpeg_executable = 'C:\\Users\\ikond\\AppData\\Roaming\\.minecraft\\ffmpeg-4.4-essentials_build\\bin\\ffmpeg.exe'
