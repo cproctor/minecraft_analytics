@@ -42,5 +42,5 @@ def slice_excerpt(input_filepath, start_time, length, label):
     try:
         ff.run()
     except ffmpy.FFRuntimeError:
-        sys.stderr.write("The label " + label + " is already taken for this file.")
-        sys.stderr.write(" Please choose something else or delete " + output_filepath + ".")
+        sys.stderr.write('The label "' + label + '" is already taken for this file name or you tried to create an'
+                                                 ' excerpt of an invalid file type.')
