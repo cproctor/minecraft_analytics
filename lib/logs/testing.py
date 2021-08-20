@@ -12,6 +12,8 @@ def main():
     file_excerpt2 = "../../data/minecraft_audio_recordings/2021_07_14_workshop_2_zoom.mp4"
     selection.slice_excerpt(file_excerpt2, '00:05:04', '00:01:03', 'test')
 
+    print(collaboration.jva({"isabelle": {"x": 9, "y": 82, "z": -700}, "rob": {"x": 10, "y": 82, "z": -700}}))
+
 
 if __name__ == '__main__':
     main()
