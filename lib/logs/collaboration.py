@@ -31,10 +31,11 @@ def player_distance(df, player_0, player_1):
 
 
 # target_blocks_dct format: {"player_name": {"x": x, "y": y, "z": z}}
-# jva_vals is a dictionary with Block objects (minecraft_block.py) as keys and the level as values
+# jva_vals is a dictionary with Block objects (minecraft_block.py) as keys and the heat level as values
 def jva(target_blocks_dct):
     jva_vals = {}
 
+    # puts all the given target blocks in a dictionary with its heat level as 3
     for block_dct in target_blocks_dct.values():
         x = block_dct["x"]
         y = block_dct["y"]
@@ -49,20 +50,37 @@ def jva(target_blocks_dct):
     return jva_vals
 
 
-def nearby_blocks(dct, block, offset):
-    num_blocks = 0
+# takes jva_vals from the jva() function above, a target block, and an offset
+# for each block within the offset of the given target block, that block's heat level will be updated
+# heat level is 0 for blocks outside the offset
+# heat level increase is 2 for blocks with offset 1
+# heat level increase is 1 for blocks with offset 2
+def nearby_blocks(jva_vals, target_block, offset):
     level_add = 0
     if offset == 1:
-        num_blocks = 26     # a 3x3 empty cube is made up of 26 blocks
         level_add = 2
-    if offset == 2:
-        num_blocks = 98     # a 5x5 empty cube is made up of 98 blocks
+    elif offset == 2:
         level_add = 1
 
-    x = block.x
-    y = block.y
-    z = block.z
-    for n in range(num_blocks):
-        print()
+    x = target_block.x
+    y = target_block.y
+    z = target_block.z
 
-    return dct
+    x_minus = x - offset    # min x value for block in offset
+    x_plus = x + offset     # max x value
+    y_minus = y - offset    # min y value for block in offset
+    y_plus = y + offset     # max y value
+    z_minus = z - offset    # min z value
+    z_plus = z + offset     # max z value
+
+    # add the heat level (level_add) to the block's preexisting heat level
+    for i in range(x_minus, x_plus+1):
+        for n in range(y_minus, y_plus+1):
+            for t in range(z_minus, z_plus+1):
+                print("tbd")
+
+    return jva_vals
+
+
+def one_block_face(level_add, x_min, x_max, y_min, y_max, z_min, z_max):
+    return ":)"
