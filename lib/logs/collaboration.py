@@ -74,13 +74,36 @@ def nearby_blocks(jva_vals, target_block, offset):
     z_plus = z + offset     # max z value
 
     # add the heat level (level_add) to the block's preexisting heat level
-    for i in range(x_minus, x_plus+1):
-        for n in range(y_minus, y_plus+1):
-            for t in range(z_minus, z_plus+1):
-                print("tbd")
+    one_block_face(level_add, x_minus, x_minus, y_minus, y_plus, z_minus, z_plus)   # 1st side
+    one_block_face(level_add, x_plus, x_plus, y_minus, y_plus, z_minus, z_plus)     # 2nd side
+    one_block_face(level_add, x_minus, x_plus, y_minus, y_minus, z_minus, z_plus)   # 3rd side
+    one_block_face(level_add, x_minus, x_plus, y_plus, y_plus, z_minus, z_plus)     # 4th side
+    one_block_face(level_add, x_minus, x_plus, y_minus, y_plus, z_minus, z_minus)   # 5th side
+    one_block_face(level_add, x_minus, x_plus, y_minus, y_plus, z_plus, z_plus)     # 6th side
 
     return jva_vals
 
 
+# if you imagine all the blocks as a hollow Rubik's cube, we're looking at one side in this function
+# this is the function that should modify heat levels
 def one_block_face(level_add, x_min, x_max, y_min, y_max, z_min, z_max):
+    if x_min == x_max:
+        make_2d_array(y_min, y_max, z_min, z_max, x_min)
+    elif y_min == y_max:
+        make_2d_array(x_min, x_max, z_min, z_max, y_min)
+    elif z_min == z_max:
+        make_2d_array(x_min, x_max, y_min, y_max, z_min)
     return ":)"
+
+
+# this function constructs a data structure representation of one side of the hollow Rubik's cube
+# min1 and max1 are the constraints in one dimension
+# min2 and max2 are the constraints in the other dimension
+# pos is a single int (i.e. if using this function for the side that has z=z_min, then min1=x_min, max1=x_max,
+#                       min2=y_min, max2=y_max, and pos=z_min)
+def make_2d_array(min1, max1, min2, max2, pos):
+    retval = []
+    for i in range(min1, max1+1):
+        for j in range(min2, max2+1):
+            print("tbd")
+    return retval
