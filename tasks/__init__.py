@@ -4,6 +4,7 @@ import code
 import sys
 import yaml
 import pandas as pd
+import numpy as np
 
 sys.path.append("lib")
 
@@ -74,9 +75,11 @@ def export_segment(c, params_file, dryrun=False):
     segment.export()
 
 @task
-def manifest(c, interact=False):
+def manifest(c, time=None, interact=False):
     "List and filter media assets"
-    df = get_metadata_df(c.local.data_path)
+    if time:
+        time = np.datetime64(time)
+    df = get_metadata_df(c.local.data_path, time=time)
     pd.options.display.max_colwidth = 100
     print(df.fillna("").sort_values("start"))
     if interact:

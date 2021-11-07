@@ -10,7 +10,7 @@ from dateutil import parser
 METADATA_SUFFIX = ".meta.yaml"
 AUDIO_FILE_TYPES = ["m4a", "mp4"]
 
-def get_metadata_df(data_dir):
+def get_metadata_df(data_dir, time=None):
     """Builds a metadata dataframe.
     """
     metadata = []
@@ -35,6 +35,8 @@ def get_metadata_df(data_dir):
     df = pd.DataFrame.from_records(metadata)
     df = df[['observer', 'device', 'file_type', 'start', 'end', 'duration', 'path', 'metadata_path']]
     df = df.sort_values("start").reset_index(drop=True)
+    if time:
+        df = df[(df.start <= time) & (df.end >= time)]
     return df
 
 def is_audio(filepath):
