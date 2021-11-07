@@ -1,21 +1,21 @@
 import yaml
 import pandas as pd
+import numpy as np
 from pathlib import Path
-from dateutil import parser
 from subprocess import run
 import re
 import json
+from dateutil import parser
 
 METADATA_SUFFIX = ".meta.yaml"
 AUDIO_FILE_TYPES = ["m4a", "mp4"]
 
 def get_metadata_df(data_dir):
+    """Builds a metadata dataframe.
+    """
     metadata = []
     for f in Path(data_dir).glob("**/*" + METADATA_SUFFIX):
         md = yaml.safe_load(f.read_text())
-        if "begin" in md: print(f)
-        if md.get("start"):
-            md["start"] = parser.parse(md["start"])
         md["metadata_path"] = str(f.relative_to(data_dir))
         filepath = f.parent / f.name[:-len(METADATA_SUFFIX)]
         if filepath.exists():
@@ -25,10 +25,17 @@ def get_metadata_df(data_dir):
             audio_md = get_audio_metadata(filepath)
             md["start"] = md.get("start", audio_md.get("start"))
             md["duration"] = md.get("duration", audio_md.get("duration"))
+        if md.get("start"):
+            md["start"] = np.datetime64(md["start"])
         if isinstance(md.get("duration"), str):
             md["duration"] = ts2s(md["duration"])
+        if md.get("start") and md.get("duration"):
+            md["end"] = md["start"] + np.timedelta64(int(md["duration"]), 's')
         metadata.append(md)
-    return pd.DataFrame.from_records(metadata, )
+    df = pd.DataFrame.from_records(metadata)
+    df = df[['observer', 'device', 'file_type', 'start', 'end', 'duration', 'path', 'metadata_path']]
+    df = df.sort_values("start").reset_index(drop=True)
+    return df
 
 def is_audio(filepath):
     "Checks whether a file is audio"
@@ -47,6 +54,8 @@ def get_audio_metadata(filepath):
         "start": result.get('format', {}).get('tags', {}).get('creation_time'),
         "duration": result.get('format', {}).get('duration')
     }
+    if md.get("start"):
+        md["start"] = parser.parse(md["start"])
     if md.get("duration"):
         md['duration'] = float(md['duration'])
     return md
@@ -54,4 +63,4 @@ def get_audio_metadata(filepath):
 def ts2s(ts):
     "Convert duration timestamp (03:12:45) to seconds"
     h, m, s = ts.split(":")
-    return int(h)*60*60 + int(m)*60 + float(s)
+    return int(h)*60*60 + int(m)*60 + int(s)

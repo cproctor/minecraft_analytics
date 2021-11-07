@@ -78,7 +78,7 @@ def manifest(c, interact=False):
     "List and filter media assets"
     df = get_metadata_df(c.local.data_path)
     pd.options.display.max_colwidth = 100
-    print(df.fillna(""))
+    print(df.fillna("").sort_values("start"))
     if interact:
         print("Synced dataframe is bound to `df`")
         code.interact(local=locals())
