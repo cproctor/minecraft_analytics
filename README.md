@@ -5,6 +5,8 @@ Utopia research project.
 
 ## Installation
 
+First, ensure you have ffmpeg and ffprobe installed. 
+
 This repository has a submodule, the [data repo](https://github.com/cproctor/minecraft-utopia-data). 
 When you clone this repo, use `--recurse-submodules` to also check out the
 submodule. If you already have this repo cloned, you can initialize and fetch
@@ -74,3 +76,16 @@ The top-level directories in this repo are:
 - **tasks**: Definitions of [invoke](http://www.pyinvoke.org/) tasks, this package's
   high-level API.
 - **tutorial**: Space for stuff meant for team members' learning.
+
+## Next steps
+
+- Select collaboration segments to analyze
+  - Specify metadata format
+- See if I can find any additional audio resources
+- Write joint visual attention code
+
+### The big question
+
+How would we conceptualize and validate high-quality collaboration? 
+
+- Need to read recent ICLS papers on this

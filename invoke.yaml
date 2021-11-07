@@ -3,5 +3,6 @@ minecraft_server:
   username: chris
   mscs_dir: "/opt/mscs"
 local:
+  data_path: "data"
   logs_path: "data/logs"
   dataframe_path: "data/df"

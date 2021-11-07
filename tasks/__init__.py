@@ -9,6 +9,7 @@ sys.path.append("lib")
 
 from lib.logs.reader import LogReader
 from lib.segment import Segment
+from lib.metadata import get_metadata_df
 
 @task(help={
     "world": "name of world",
@@ -71,6 +72,17 @@ def export_segment(c, params_file, dryrun=False):
     segment = Segment(yaml.safe_load())
     segment.validate()
     segment.export()
+
+@task
+def manifest(c, interact=False):
+    "List and filter media assets"
+    df = get_metadata_df(c.local.data_path)
+    pd.options.display.max_colwidth = 100
+    print(df.fillna(""))
+    if interact:
+        print("Synced dataframe is bound to `df`")
+        code.interact(local=locals())
+    
 
 
 
