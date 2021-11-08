@@ -15,22 +15,7 @@ def get_metadata_df(data_dir, time=None):
     """
     metadata = []
     for f in Path(data_dir).glob("**/*" + METADATA_SUFFIX):
-        md = yaml.safe_load(f.read_text())
-        md["metadata_path"] = str(f.relative_to(data_dir))
-        filepath = f.parent / f.name[:-len(METADATA_SUFFIX)]
-        if filepath.exists():
-            md["path"] = str(filepath.relative_to(data_dir))
-            md["file_type"] = filepath.suffix[1:]
-        if is_audio(filepath):
-            audio_md = get_audio_metadata(filepath)
-            md["start"] = md.get("start", audio_md.get("start"))
-            md["duration"] = md.get("duration", audio_md.get("duration"))
-        if md.get("start"):
-            md["start"] = np.datetime64(md["start"])
-        if isinstance(md.get("duration"), str):
-            md["duration"] = ts2s(md["duration"])
-        if md.get("start") and md.get("duration"):
-            md["end"] = md["start"] + np.timedelta64(int(md["duration"]), 's')
+        md = get_media_metadata(f)
         metadata.append(md)
     df = pd.DataFrame.from_records(metadata)
     df = df[['observer', 'device', 'file_type', 'start', 'end', 'duration', 'path', 'metadata_path']]
@@ -38,6 +23,28 @@ def get_metadata_df(data_dir, time=None):
     if time:
         df = df[(df.start <= time) & (df.end >= time)]
     return df
+
+def get_media_metadata(metadata_path):
+    """Reads metadata from x.meta.yaml and infers additional metadata.
+    """
+    metadata_path = Path(metadata_path)
+    md = yaml.safe_load(metadata_path.read_text())
+    md["metadata_path"] = str(metadata_path)
+    filepath = metadata_path.parent / metadata_path.name[:-len(METADATA_SUFFIX)]
+    if filepath.exists():
+        md["path"] = str(filepath)
+        md["file_type"] = filepath.suffix[1:]
+    if is_audio(filepath):
+        audio_md = get_audio_metadata(filepath)
+        md["start"] = md.get("start", audio_md.get("start"))
+        md["duration"] = md.get("duration", audio_md.get("duration"))
+    if md.get("start"):
+        md["start"] = np.datetime64(md["start"])
+    if isinstance(md.get("duration"), str):
+        md["duration"] = ts2s(md["duration"])
+    if md.get("start") and md.get("duration"):
+        md["end"] = md["start"] + np.timedelta64(int(md["duration"]), 's')
+    return md
 
 def is_audio(filepath):
     "Checks whether a file is audio"

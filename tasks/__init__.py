@@ -64,15 +64,15 @@ def interact(c, world, minecraft_username=None):
     code.interact(local=locals())
 
 @task
-def export_segment(c, params_file, dryrun=False):
+def export_segment(c, params_file, clean=False, dryrun=False):
     "Export a segment as speficied by a params file"
     pf = Path(params_file)
     if not pf.exists():
         raise ValueError("{} does not exist".format(pf))
     params = yaml.safe_load(pf.read_text())
-    segment = Segment(yaml.safe_load())
+    segment = Segment(params)
     segment.validate()
-    segment.export()
+    segment.export(clean=clean)
 
 @task
 def manifest(c, time=None, interact=False):
