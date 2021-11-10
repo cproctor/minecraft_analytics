@@ -13,6 +13,7 @@ ics = "^0.7"
 pyaml = "^20.4.0"
 jupyter = "^1.0.0"
 python-dateutil = "^2.8.2"
+matplotlib = "^3.4.3"
 
 [tool.poetry.dev-dependencies]
 
