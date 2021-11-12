@@ -14,13 +14,19 @@ class SegmentTrace(SegmentLogs):
         "alpha",
         "size",
         "palette",
-        "diachronic"
+        "diachronic",
+        "xlim",
+        "ylim",
     ]
     default_granularity = "1s"
     default_alpha = 0.1
     default_size=50
     default_diachronic_palette="flare"
     default_heatmap_palette="hls"
+
+    # Contains all final builds and collaboration (at least for week 1)
+    default_xlim = [-100, 350]
+    default_ylim = [-100, 900]
 
     def export(self):
         df = self.get_segment_data()
@@ -36,6 +42,8 @@ class SegmentTrace(SegmentLogs):
                 self.plot_diachronic(df)
             else:
                 self.plot_heatmap(df)
+            plt.xlim(self.params.get('xlim', self.default_xlim))
+            plt.ylim(self.params.get('ylim', self.default_ylim))
             plt.savefig(self.export_filename('plot_filename'), bbox_inches="tight")
         
     def plot_diachronic(self, df):
