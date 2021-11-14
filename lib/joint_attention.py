@@ -56,9 +56,3 @@ def plot_boolean_joint_attention(df):
         times = df[df[col]].index
         ax.scatter(x=times, y=[col] * len(times), marker='s')
     return fig
-        
-    
-
-
-
-

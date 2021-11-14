@@ -68,11 +68,11 @@ class SegmentJointAttention(SegmentLogs):
         for a, b in keypairs:
             lgdf[a + '-' + b] = joint_attention_schneider_pea_2013(lgdf, a, b, 
                     distance_threshold=dt, window_seconds=ws)
-        result = lgdf[[a + '-' + b for a, b in keypairs]]
-        result = self.trim_df(result)
+        result = self.trim_df(lgdf)
         result.to_csv(self.export_filename())
         if self.params.get('plot_filename'):
             figfile = self.export_filename('plot_filename')
+            result = result[[a + '-' + b for a, b in keypairs]]
             fig = plot_boolean_joint_attention(result)
             plt.title(self.params.get('plot_title', self.default_plot_title))
             plt.ylim([-0.5, len(result.columns) - 0.5])
