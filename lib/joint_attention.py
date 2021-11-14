@@ -26,7 +26,7 @@ def get_location_gaze(df, players):
     return lgdf
 
 def distance_measure(df, key_a, key_b, location):
-    """Computes the distance between two players for a given location.
+    """Computes the squared distance between two players for a given location.
     df should be in lgdf form. key_a and key_b refer to players; 
     location may be 'location', 'eye_location', or 'target_block'.
     """
@@ -43,7 +43,7 @@ def joint_attention_schneider_pea_2013(df, key_a, key_b, distance_threshold=10, 
     Richardson & Dale, 2005. 
     """
     dist = distance_measure(df, key_a, key_b, 'target_block')
-    joint = dist <= distance_threshold
+    joint = dist ** 2 <= distance_threshold
     windows = joint.rolling(str(window_seconds)+'s')
     return windows.max().astype(bool)
 
