@@ -19,7 +19,7 @@ class SegmentLogs(SegmentProduct):
             datapath = self.get_cached_log_path()
         else:
             datapath = self.main_log_file
-        df = pd.read_csv(datapath, index_col="timestamp", parse_dates=["timestamp"])
+        df = pd.read_csv(datapath, index_col="timestamp", parse_dates=["timestamp"], low_memory=False)
         df = df.sort_index()
         start, end = self.get_start_end_times()
         df = df.loc[start:end]

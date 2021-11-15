@@ -15,6 +15,7 @@ class SegmentTrace(SegmentLogs):
         "size",
         "palette",
         "diachronic",
+        "plot_title",
         "xlim",
         "ylim",
     ]
@@ -39,12 +40,17 @@ class SegmentTrace(SegmentLogs):
         if self.params.get('plot_filename'):
             sns.set_theme(style="white")
             if self.params.get("diachronic"):
-                self.plot_diachronic(df)
+                ax = self.plot_diachronic(df)
             else:
-                self.plot_heatmap(df)
+                ax = self.plot_heatmap(df)
             plt.xlim(self.params.get('xlim', self.default_xlim))
             plt.ylim(self.params.get('ylim', self.default_ylim))
-            plt.savefig(self.export_filename('plot_filename'), bbox_inches="tight")
+            if self.params.get("plot_title"):
+                plt.suptitle(self.params.get("plot_title"))
+            ax.set(xlabel="X")
+            ax.set(ylabel="Z")
+            ax.figure.tight_layout()
+            plt.savefig(self.export_filename('plot_filename'))
         
     def plot_diachronic(self, df):
         df = df.reset_index()
@@ -66,6 +72,7 @@ class SegmentTrace(SegmentLogs):
         sm.set_array([df.index.min(), df.index.max()])
         cbar = ax.figure.colorbar(sm)
         cbar.ax.set_yticklabels(pd.to_datetime(cbar.get_ticks()).strftime(date_format='%H:%M'))
+        return ax
             
     def plot_heatmap(self, df):
         return sns.relplot(

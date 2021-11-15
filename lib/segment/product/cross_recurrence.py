@@ -62,8 +62,8 @@ class SegmentCrossRecurrence(SegmentJointAttention):
         d2 = axd2['x'] + axd2['y'] + axd2['z']            
         dt2 = self.params.get('distance_threshold', self.default_distance_threshold) ** 2
         cross_recurrence = d2 <= dt2
-
         np.save(self.export_filename(), cross_recurrence)
+
         if self.params.get("plot_filename"):
             date_format = mdates.DateFormatter('%H:%M')
             extent = mdates.date2num([lgdf.index[0].to_pydatetime(), lgdf.index[-1].to_pydatetime()] * 2)
@@ -75,6 +75,8 @@ class SegmentCrossRecurrence(SegmentJointAttention):
             ax.yaxis.set_major_formatter(date_format)
             ax.set_xlabel(p0)
             ax.set_ylabel(p1)
+            if self.params.get("plot_title"):
+                plt.suptitle(self.params.get("plot_title"))
             ax.figure.savefig(self.export_filename("plot_filename"), bbox_inches="tight")
 
 
