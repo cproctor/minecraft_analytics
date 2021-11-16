@@ -71,5 +71,10 @@ def get_audio_metadata(filepath):
 
 def ts2s(ts):
     "Convert duration timestamp (03:12:45) to seconds"
-    h, m, s = ts.split(":")
-    return int(h)*60*60 + int(m)*60 + int(s)
+    try:
+        h, m, s = ts.split(":")
+        return int(h)*60*60 + int(m)*60 + int(s)
+    except ValueError:
+        m, s = ts.split(":")
+        return int(m)*60 + int(s)
+

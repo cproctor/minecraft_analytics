@@ -39,7 +39,8 @@ class SegmentVideo(SegmentProduct):
             self.params['audio_source'],
             self.export_filename(),
         )
-        run(command, shell=True)
+        print(command)
+        run(command, shell=True, check=True)
 
     def trim_video(self):
         """Trims a video"""
@@ -51,13 +52,5 @@ class SegmentVideo(SegmentProduct):
             self.params['video_source'],
             self.export_filename(),
         )
-        run(command, shell=True)
-
-    def get_media_relative_start_time(self, source_path):
-        """Returns the media's relative start time as HH:MM:SS. 
-        """
-        source_path = Path(source_path)
-        metadata_path = source_path.parent / (source_path.name + METADATA_SUFFIX)
-        md = get_media_metadata(metadata_path)
-        return self.segment_params['start'] - md['start'].astype(datetime)
-
+        print(command)
+        run(command, shell=True, check=True)
