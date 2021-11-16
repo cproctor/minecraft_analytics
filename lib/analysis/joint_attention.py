@@ -9,12 +9,15 @@ import statsmodels.api as sm
 class JointAttentionCollaborationModel(BaseModel):
     """
         Computes Schneider, et al's (2016) collaboration metric, considering 
-        triads pairwise.
+        triads pairwise when specified, otherwise when any pair in the group had JVA.
     """
     expected_params = [
         'model',
         'export_dir',
         'group_names',
+    ]
+    optional_params = [
+        'pairwise',
     ]
     collaboration_assessment_file = "data/collaboration_assessment/collaboration_assessment.csv"
     export_base_name = "jva_collaboration"
@@ -34,18 +37,27 @@ class JointAttentionCollaborationModel(BaseModel):
                 group_size = 2
             else:
                 raise ValueError("Group size larger than 3 not supported")
-            
-            for col in [col for col in jva.columns if '-' in col]:
+
+            if self.params.get('pairwise'):
+                for col in [col for col in jva.columns if '-' in col]:
+                    data.append({
+                        "group": group,
+                        "group_size": group_size,
+                        "collaboration_score": score,
+                        "percentage_jva": jva[col].mean(),
+                    })
+            else:
                 data.append({
                     "group": group,
                     "group_size": group_size,
                     "collaboration_score": score,
-                    "percentage_jva": jva[col].mean(),
+                    "percentage_jva": jva[pairwise_jva_cols].any(axis=1).mean(),
                 })
-        df = pd.DataFrame.from_records(data, index="group")
+
+        df = pd.DataFrame.from_records(data)
         df.to_csv(self.export_dir() / (self.export_base_name + ".csv"))
 
-        lm = sns.lmplot(x="percentage_jva", y="collaboration_score", hue="group_size", data=df)
+        lm = sns.lmplot(x="percentage_jva", y="collaboration_score", data=df)
         ax = lm.axes[0, 0]
         ax.set_ylim([-0.5, 5.5])
         ax.figure.savefig(self.export_dir() / (self.export_base_name + ".png"))

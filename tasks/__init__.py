@@ -5,12 +5,19 @@ import sys
 import yaml
 import pandas as pd
 import numpy as np
+from datetime import datetime, timedelta
 
 sys.path.append("lib")
 
-from lib.logs.reader import LogReader
-from lib.segment import Segment
-from lib.metadata import get_metadata_df
+from logs.reader import LogReader
+from segment import Segment
+from metadata import (
+    get_metadata_df, 
+    get_media_metadata, 
+    METADATA_SUFFIX, 
+    ts2s,
+)
+from analysis import MODELS
 
 @task(help={
     "world": "name of world",
@@ -85,7 +92,67 @@ def manifest(c, time=None, interact=False):
     if interact:
         print("Synced dataframe is bound to `df`")
         code.interact(local=locals())
+
+@task
+def localize(c, time, media_path, duration=None, end=None, reverse=False):
+    """Convert a UTC timestamp to relative local time within a media path. 
+    """
+    if duration and end:
+        raise ValueError("Must not specify duration and end")
+
+    mp = Path(media_path)
+    mp = mp.parent / (mp.name + METADATA_SUFFIX)
+    md = get_media_metadata(mp)
+
+    media_start_utc = pd.to_datetime(md['start']).to_pydatetime()
+    if reverse:
+        segment_start_media = timedelta(seconds=ts2s(time))
+        segment_start_utc = media_start_utc + segment_start_media
+    else:
+        segment_start_utc = pd.to_datetime(time).to_pydatetime()
+        segment_start_media = segment_start_utc - media_start_utc
+    if duration:
+        if duration.isdigit():
+            duration = timedelta(seconds=int(duration))
+        else:
+            duration = timedelta(seconds=ts2s(duration))
+        segment_end_utc = segment_start_utc + duration
+        segment_end_media = segment_start_media + duration
+    elif end:
+        if reverse:
+            segment_end_media = timedelta(seconds=ts2s(end))
+            segment_end_utc = media_start_utc + segment_end_media
+        else:
+            segment_end_utc = pd.to_datetime(end).to_pydatetime()
+            segment_end_media = segment_end_utc - media_start_utc
+        duration = segment_end_utc - segment_start_utc
+    else:
+        duration = None
+        end = None
     
+    if reverse and duration:
+        print(f"{segment_start_utc} - {segment_end_utc} ({duration})")
+    elif reverse:
+        print(f"{segment_start_utc}")
+    elif duration:
+        print(f"{segment_start_media} - {segment_end_media} ({duration})")
+    else:
+        print(f"{segment_start_media}")
 
-
+@task
+def analysis(c, params_file, clean=False):
+    "Compute named analysis"
+    pf = Path(params_file)
+    if not pf.exists():
+        raise ValueError("{} does not exist".format(pf))
+    params = yaml.safe_load(pf.read_text())
+    try:
+        Model = MODELS[params['model']]
+    except KeyError:
+        raise ValueError("Model {} not found.".format(params['model']))
+    model = Model(params)
+    model.validate()
+    model.prepare_export_dir(clean=clean)
+    model.export()
+    
 
