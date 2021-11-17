@@ -25,7 +25,7 @@ class SegmentCrossRecurrenceAugmented(SegmentCrossRecurrence):
         df = self.get_segment_data()
         lgdf = get_location_gaze(df, self.params['players'])
         lgdf = lgdf.resample(self.params.get("granularity", self.default_granularity)).first()
-        #badf = self.get_block_action_df(df)
+        badf = self.get_block_action_df(df)
         (player_label0, player0), (player_label1, player1) = self.params["players"].items()
         i, j = np.indices((len(lgdf), len(lgdf)))
         axd2 = {}
@@ -36,28 +36,27 @@ class SegmentCrossRecurrenceAugmented(SegmentCrossRecurrence):
         d2 = axd2['x'] + axd2['y'] + axd2['z']            
         dt2 = self.params.get('distance_threshold', self.default_distance_threshold) ** 2
         cross_recurrence = d2 <= dt2
-        #np.save(self.export_filename(), cross_recurrence)
-        #np.save(self.export_filename('block_action_filename'), badf)
+        np.save(self.export_filename(), cross_recurrence)
+        np.save(self.export_filename('block_action_filename'), badf)
 
         if self.params.get("plot_filename"):
             date_format = mdates.DateFormatter('%H:%M')
-            #fig = plt.figure(figsize=(8, 8), constrained_layout=True)
-            #spec = fig.add_gridspec(2, 2, width_ratios=[5, 1], height_ratios=[1,5])
-            #axcr = fig.add_subplot(spec[1, 0])
-            #axtop = fig.add_subplot(spec[0, 0], sharex=axcr)
-            #axright = fig.add_subplot(spec[1, 1], sharey=axcr)
-
-            fig, axcr = plt.subplots()
+            fig = plt.figure(figsize=(8, 8), constrained_layout=True)
+            spec = fig.add_gridspec(2, 2, width_ratios=[5, 1], height_ratios=[1,5])
+            axcr = fig.add_subplot(spec[1, 0])
+            axtop = fig.add_subplot(spec[0, 0], sharex=axcr)
+            axright = fig.add_subplot(spec[1, 1], sharey=axcr)
 
             time_bounds = [lgdf.index[0].to_pydatetime(), lgdf.index[-1].to_pydatetime()]
-            #time_bounds = [badf.index[0].to_pydatetime(), badf.index[-1].to_pydatetime()] 
             extent = mdates.date2num(time_bounds * 2)
 
-            #axtop.plot(badf.index, badf[player0])
-            #axtop.axes.get_xaxis().set_visible(False)
-            #axtop.set_xlim(time_bounds)
-            #axright.plot(badf[player1], badf.index)
-            #axright.axes.get_yaxis().set_visible(False)
+            axtop.plot(badf.index, badf[player0])
+            axtop.axes.get_xaxis().set_visible(False)
+            axtop.set_xlim(time_bounds)
+            axtop.set_ylabel("Block edits")
+            axright.plot(badf[player1], badf.index)
+            axright.axes.get_yaxis().set_visible(False)
+            axright.set_xlabel("Block edits")
 
             axcr.imshow(
                 cross_recurrence, 
@@ -74,10 +73,10 @@ class SegmentCrossRecurrenceAugmented(SegmentCrossRecurrence):
             axcr.set_xlabel(player_label0)
             axcr.set_ylabel(player_label1)
 
-            #_, max0 = axtop.get_ylim()
-            #_, max1 = axright.get_xlim()
-            #axtop.set_ylim([0, max(max0, max1)])
-            #axright.set_xlim([0, max(max0, max1)])
+            _, max0 = axtop.get_ylim()
+            _, max1 = axright.get_xlim()
+            axtop.set_ylim([0, max(max0, max1)])
+            axright.set_xlim([0, max(max0, max1)])
 
             if self.params.get("plot_title"):
                 plt.suptitle(self.params.get("plot_title"))
