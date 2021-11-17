@@ -27,8 +27,6 @@ class SegmentCrossRecurrence(SegmentJointAttention):
         "granularity",
     ]
     default_lookback = 0
-    default_plot_title = "Joint Visual Attention"
-    default_distance_threshold = 10
     default_granularity = "1s"
 
     location = "target_block"

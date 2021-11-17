@@ -32,7 +32,7 @@ class SegmentJointAttention(SegmentLogs):
         "plot_title",
     ]
     default_plot_title = "Joint Visual Attention"
-    default_distance_threshold = 10
+    default_distance_threshold = 6
     default_window_seconds = 2
 
     def get_start_end_times(self):
