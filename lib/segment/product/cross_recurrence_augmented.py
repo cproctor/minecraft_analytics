@@ -17,8 +17,16 @@ class SegmentCrossRecurrenceAugmented(SegmentCrossRecurrence):
     expected_params = [
         "format",
         "export_filename",
-        "block_action_filename",
         "players",
+    ]
+    optional_params = [
+        "use_cache",
+        "lookback",
+        "plot_filename",
+        "distance_threshold",
+        "plot_title",
+        "granularity",
+        "block_action_filename",
     ]
 
     def export(self):
@@ -37,10 +45,12 @@ class SegmentCrossRecurrenceAugmented(SegmentCrossRecurrence):
         dt2 = self.params.get('distance_threshold', self.default_distance_threshold) ** 2
         cross_recurrence = d2 <= dt2
         np.save(self.export_filename(), cross_recurrence)
-        np.save(self.export_filename('block_action_filename'), badf)
+        if self.params.get('block_action_filename'):
+            badf.to_csv(self.export_filename('block_action_filename'))
 
         if self.params.get("plot_filename"):
             date_format = mdates.DateFormatter('%H:%M')
+            zeros = np.zeros(shape=(len(badf), 1))
             fig = plt.figure(figsize=(8, 8), constrained_layout=True)
             spec = fig.add_gridspec(2, 2, width_ratios=[5, 1], height_ratios=[1,5])
             axcr = fig.add_subplot(spec[1, 0])
@@ -50,11 +60,17 @@ class SegmentCrossRecurrenceAugmented(SegmentCrossRecurrence):
             time_bounds = [lgdf.index[0].to_pydatetime(), lgdf.index[-1].to_pydatetime()]
             extent = mdates.date2num(time_bounds * 2)
 
-            axtop.plot(badf.index, badf[player0])
+            if player0 in badf.columns:
+                axtop.plot(badf.index, badf[player0])
+            else:
+                axtop.plot(badf.index, zeros)
             axtop.axes.get_xaxis().set_visible(False)
             axtop.set_xlim(time_bounds)
             axtop.set_ylabel("Block edits")
-            axright.plot(badf[player1], badf.index)
+            if player1 in badf.columns:
+                axright.plot(badf[player1], badf.index)
+            else:
+                axright.plot(zeros, badf.index)
             axright.axes.get_yaxis().set_visible(False)
             axright.set_xlabel("Block edits")
 
