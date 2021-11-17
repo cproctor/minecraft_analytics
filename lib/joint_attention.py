@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import seaborn as sns
 import pandas as pd
 import numpy as np
@@ -51,7 +52,9 @@ def joint_attention_schneider_pea_2013(df, key_a, key_b, distance_threshold=10, 
 def plot_boolean_joint_attention(df):
     """Plots boolean values; returns figure
     """
+    date_format = mdates.DateFormatter('%H:%M')
     fig, ax = plt.subplots(figsize=(6, 2))
+    ax.xaxis.set_major_formatter(date_format)
     fig.autofmt_xdate()
     for col in df.columns:
         times = df[df[col]].index
