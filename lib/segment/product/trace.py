@@ -3,6 +3,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
+# Suppressing: UserWarning: FixedFormatter should only be used together with FixedLocator
+import warnings
+warnings.filterwarnings("ignore")
+
+
 class SegmentTrace(SegmentLogs):
     """Produces a heatmap of character locations
     """
