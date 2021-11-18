@@ -7,6 +7,8 @@ import seaborn as sns
 import warnings
 warnings.filterwarnings("ignore")
 
+def reverse_dict(d):
+    return {v:k for k, v in d.items()}
 
 class SegmentTrace(SegmentLogs):
     """Produces a heatmap of character locations
@@ -38,11 +40,15 @@ class SegmentTrace(SegmentLogs):
         df = self.get_segment_data()
         df = df[["player", "location_x", "location_z"]]
         if self.params.get("players"):
-            df = df[df.player.isin(self.params['players'])]
+            df = df[df.player.isin(self.params['players'].values())]
         granularity = self.params.get("granularity", self.default_granularity)
         df = df.resample(granularity).first().dropna()
         df.to_csv(self.export_filename())
+
         if self.params.get('plot_filename'):
+            reverse_lookup = reverse_dict(self.params['players'])
+            df['player'] = df.player.apply(lambda player: reverse_lookup[player])
+
             sns.set_theme(style="white")
             if self.params.get("diachronic"):
                 ax = self.plot_diachronic(df)
