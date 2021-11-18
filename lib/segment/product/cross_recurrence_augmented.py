@@ -31,15 +31,15 @@ class SegmentCrossRecurrenceAugmented(SegmentCrossRecurrence):
 
     def export(self):
         df = self.get_segment_data()
-        lgdf = get_location_gaze(df, self.params['players'])
+        lgdf = get_location_gaze(df, self.params['players'].values())
         lgdf = lgdf.resample(self.params.get("granularity", self.default_granularity)).first()
         badf = self.get_block_action_df(df)
         (player_label0, player0), (player_label1, player1) = self.params["players"].items()
         i, j = np.indices((len(lgdf), len(lgdf)))
         axd2 = {}
         for ax in ['x', 'y', 'z']:
-            p0ax = lgdf[f"{player_label0}_target_block_{ax}"].to_numpy()
-            p1ax = lgdf[f"{player_label1}_target_block_{ax}"].to_numpy()
+            p0ax = lgdf[f"{player0}_target_block_{ax}"].to_numpy()
+            p1ax = lgdf[f"{player1}_target_block_{ax}"].to_numpy()
             axd2[ax] = (p0ax[i] - p1ax[j]) ** 2
         d2 = axd2['x'] + axd2['y'] + axd2['z']            
         dt2 = self.params.get('distance_threshold', self.default_distance_threshold) ** 2

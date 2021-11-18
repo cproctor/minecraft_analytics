@@ -44,6 +44,7 @@ class MultimodalCollaborationModel(BaseModel):
             ba = self.get_ba_df(group).resample(g).sum()
             score = "high" if scores.loc[group].mean() >= self.params['score_threshold'] else "low"
             players, pairwise_cols, player_cols = self.get_player_cols(jva)
+            breakpoint()
             for player, cols in player_cols.items():
                 playerdata = jva[cols].any(axis=1).to_frame("jva").resample(g).agg({
                     "jva": (lambda sample: sample.any())

@@ -48,9 +48,9 @@ class SegmentCrossRecurrence(SegmentJointAttention):
 
     def export(self):
         df = self.get_segment_data()
-        lgdf = get_location_gaze(df, self.params['players'])
+        lgdf = get_location_gaze(df, self.params['players'].values())
         lgdf = lgdf.resample(self.params.get("granularity", self.default_granularity)).first()
-        p0, p1 = self.params["players"]
+        p0, p1 = self.params["players"].values()
         i, j = np.indices((len(lgdf), len(lgdf)))
         axd2 = {}
         for ax in ['x', 'y', 'z']:

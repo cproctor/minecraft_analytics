@@ -63,16 +63,18 @@ class SegmentJointAttention(SegmentLogs):
         ws = self.params.get('window_seconds', self.default_window_seconds)
         dt = self.params.get('distance_threshold', self.default_distance_threshold)
         df = self.get_segment_data()
-        lgdf = get_location_gaze(df, self.params['players'])
+        lgdf = get_location_gaze(df, self.params['players'].values())
         keypairs = list(combinations(self.params['players'].keys(), 2))
-        for a, b in keypairs:
-            lgdf[a + '-' + b] = joint_attention_schneider_pea_2013(lgdf, a, b, 
-                    distance_threshold=dt, window_seconds=ws)
+        for k0, k1 in keypairs:
+            p0 = self.params['players'][k0]
+            p1 = self.params['players'][k1]
+            col = p0 + '-' + p1
+            lgdf[col] = joint_attention_schneider_pea_2013(lgdf, p0, p1, distance_threshold=dt, window_seconds=ws)
         result = self.trim_df(lgdf)
         result.to_csv(self.export_filename())
         if self.params.get('plot_filename'):
             figfile = self.export_filename('plot_filename')
-            result = result[[a + '-' + b for a, b in keypairs]]
+            result = result[[self.params['players'][k0] + '-' + self.params['players'][k1] for k0, k1 in keypairs]]
             fig = plot_boolean_joint_attention(result)
             plt.title(self.params.get('plot_title', self.default_plot_title))
             plt.ylim([-0.5, len(result.columns) - 0.5])

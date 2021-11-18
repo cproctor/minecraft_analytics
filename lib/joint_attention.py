@@ -18,9 +18,9 @@ def get_location_gaze(df, players):
         ['eye_direction_' + a for a in ANGLES]
     )
     dfs = []
-    for key, username in players.items():
-        player_df = df[df.player == username]
-        player_col_names = {col: key + '_' + col for col in cols}
+    for player in players:
+        player_df = df[df.player == player]
+        player_col_names = {col: player + '_' + col for col in cols}
         player_df = player_df.rename(columns=player_col_names)
         dfs.append(player_df[player_col_names.values()])
     lgdf = pd.concat(dfs).sort_index()
