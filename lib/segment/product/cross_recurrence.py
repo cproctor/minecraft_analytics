@@ -50,7 +50,7 @@ class SegmentCrossRecurrence(SegmentJointAttention):
         df = self.get_segment_data()
         lgdf = get_location_gaze(df, self.params['players'].values())
         lgdf = lgdf.resample(self.params.get("granularity", self.default_granularity)).first()
-        p0, p1 = self.params["players"].values()
+        (k0, p0), (k1, p1) = self.params["players"].items()
         i, j = np.indices((len(lgdf), len(lgdf)))
         axd2 = {}
         for ax in ['x', 'y', 'z']:
@@ -71,8 +71,8 @@ class SegmentCrossRecurrence(SegmentJointAttention):
             ax.yaxis_date()
             ax.xaxis.set_major_formatter(date_format)
             ax.yaxis.set_major_formatter(date_format)
-            ax.set_xlabel(p0)
-            ax.set_ylabel(p1)
+            ax.set_xlabel(k0)
+            ax.set_ylabel(k1)
             if self.params.get("plot_title"):
                 plt.suptitle(self.params.get("plot_title"))
             ax.figure.savefig(self.export_filename("plot_filename"), bbox_inches="tight")
