@@ -74,7 +74,9 @@ class SegmentJointAttention(SegmentLogs):
         result.to_csv(self.export_filename())
         if self.params.get('plot_filename'):
             figfile = self.export_filename('plot_filename')
-            result = result[[self.params['players'][k0] + '-' + self.params['players'][k1] for k0, k1 in keypairs]]
+            player_name_cols = [self.params['players'][k0] + '-' + self.params['players'][k1] for k0, k1 in keypairs]
+            label_cols = [k0 + '-' + k1 for k0, k1 in keypairs]
+            result = result[player_name_cols].rename(columns=dict(zip(player_name_cols, label_cols)))
             fig = plot_boolean_joint_attention(result)
             plt.title(self.params.get('plot_title', self.default_plot_title))
             plt.ylim([-0.5, len(result.columns) - 0.5])
