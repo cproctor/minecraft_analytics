@@ -54,8 +54,6 @@ class MultimodalCollaborationModel(BaseModel):
                 playerdata["collaboration_score"] = score
                 if player not in ba.columns:
                     ba[player] = 0
-            
-                # Hold up. 
                 playerdata = playerdata.merge(
                     ba[player].to_frame("block_actions"),
                     how="left",
@@ -64,22 +62,19 @@ class MultimodalCollaborationModel(BaseModel):
                 )
                 dfs.append(playerdata)
         df = pd.concat(dfs)
-
-        #RESULT 
-        # DF with columns:
-        # - collaboration_score (low/high)
-        # - jva (true/false)
-
         df.to_csv(self.export_dir() / (self.export_base_name + ".csv"))
 
         bp = sns.barplot(x="collaboration_score", hue="jva", y="block_actions", data=df)
         bp.figure.savefig(self.export_dir() / (self.export_base_name + ".png"))
-        #test = ttest_ind(
-            #df[df.collaboration_score == "low"].percentage_jva,
-            #df[df.collaboration_score == "high"].percentage_jva,
-            #equal_var=False,
-        #)
-        #print(test)
+
+        high_delta = self.mean_block_actions(df, "high", True) - self.mean_block_actions(df, "high", False)
+        low_delta = self.mean_block_actions(df, "low", True) - self.mean_block_actions(df, "low", False)
+        test = ttest_ind(
+            high_delta,
+            low_delta,
+            equal_var=False,
+        )
+        print(test)
 
     def get_player_cols(self, jva):
         """Returns (players, pairwise_cols, player_cols) from JVA df
@@ -113,6 +108,10 @@ class MultimodalCollaborationModel(BaseModel):
         workshop_num = group[1]
         f = Path("data/segments") / f"workshop_{workshop_num}_collaboration" / f"{group}_block_activity.csv"
         return pd.read_csv(f, index_col="timestamp", parse_dates=["timestamp"])
+        
+    def mean_block_actions(self, df, score, jva):
+        selection = df[(df.collaboration_score == score) & (df.jva == jva)]
+        return selection.groupby(["group", "player"]).block_actions.mean()
         
 
 
