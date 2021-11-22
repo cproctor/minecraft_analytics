@@ -83,6 +83,7 @@ class JointAttentionCollaborationModel(BaseModel):
             test = ttest_ind(
                 df[df.collaboration_score == "low"].percentage_jva,
                 df[df.collaboration_score == "high"].percentage_jva,
+                alternative="less",
                 equal_var=False,
             )
             print(test)
