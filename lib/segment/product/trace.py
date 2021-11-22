@@ -23,6 +23,7 @@ class SegmentTrace(SegmentLogs):
         "palette",
         "diachronic",
         "plot_title",
+        "location",
         "xlim",
         "ylim",
     ]
@@ -31,6 +32,7 @@ class SegmentTrace(SegmentLogs):
     default_size=50
     default_diachronic_palette="flare"
     default_heatmap_palette="hls"
+    default_location = "location"
 
     # Contains all final builds and collaboration (at least for week 1)
     default_xlim = [-100, 350]
@@ -38,7 +40,8 @@ class SegmentTrace(SegmentLogs):
 
     def export(self):
         df = self.get_segment_data()
-        df = df[["player", "location_x", "location_z"]]
+        loc = self.params.get("location", self.default_location)
+        df = df[["player", loc + "_x", loc + "_z"]]
         if self.params.get("players"):
             df = df[df.player.isin(self.params['players'].values())]
         granularity = self.params.get("granularity", self.default_granularity)
@@ -66,12 +69,13 @@ class SegmentTrace(SegmentLogs):
     def plot_diachronic(self, df):
         df = df.reset_index()
         palette = self.params.get("palette", self.default_diachronic_palette)
+        loc = self.params.get("location", self.default_location)
         ax = sns.relplot(
             data=df,
             col="player",
             hue="timestamp",
-            x="location_x",
-            y="location_z",
+            x=loc + "_x",
+            y=loc + "_z",
             alpha=self.params.get("alpha", self.default_alpha),
             edgecolor=None,
             legend=False,
@@ -86,11 +90,12 @@ class SegmentTrace(SegmentLogs):
         return ax
             
     def plot_heatmap(self, df):
+        loc = self.params.get("location", self.default_location)
         return sns.relplot(
             data=df,
             hue="player",
-            x="location_x",
-            y="location_z",
+            x=loc + "_x",
+            y=loc + "_z",
             alpha=self.params.get("alpha", self.default_alpha),
             palette=self.params.get("palette", self.default_heatmap_palette),
             edgecolor=None,
