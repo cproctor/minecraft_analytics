@@ -5,7 +5,8 @@ Utopia research project.
 
 ## Installation
 
-First, ensure you have ffmpeg and ffprobe installed. 
+First, ensure you have [ffmpeg](https://ffmpeg.org/), 
+[ffprobe](https://ffmpeg.org/ffprobe.html), and [rollup](https://www.rollupjs.org/guide/en/) installed.
 
 This repository has a submodule, the [data repo](https://github.com/cproctor/minecraft-utopia-data). 
 When you clone this repo, use `--recurse-submodules` to also check out the
