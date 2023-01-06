@@ -77,15 +77,32 @@ The top-level directories in this repo are:
   high-level API.
 - **tutorial**: Space for stuff meant for team members' learning.
 
-## Next steps
+## Usage
 
-- Select collaboration segments to analyze
-  - Specify metadata format
-- See if I can find any additional audio resources
-- Write joint visual attention code
+This package is concerned with three main concepts: **segments**, **products**, and 
+**analyses**.
 
-### The big question
+A **segment** is defined as a time span bounded by two UTC timestamps, cutting across 
+multiple streams of data, such as back-end logs from the Minecraft server, videos of 
+gameplay from screen capture or Minecraft Replay, video and audio streams from Zoom, 
+transcripts, etc. When you specify the timestamp bounds of a segment, this package
+provides slices of all the cata streams corresponding to the segment. 
 
-How would we conceptualize and validate high-quality collaboration? 
+![Diagram of a segment, specifying a time span across multiple data streams](segment.png)
 
-- Need to read recent ICLS papers on this
+A **product** is defined as a transformation of data streams within a segment into 
+a desired representation. For example, `SegmentVideo` interleaves a video of gameplay
+with an audio source, so that we can watch in-game activity while hearing players' speech.
+Other products are more abstract: `SegmentJointAttention` uses server logs of players' 
+positions and gaze vectors to calculate and plot joint visual attention (see Proctor & Muller, 2022),
+as shown below.
+
+![Joint visual attention plot](w1g1_joint_attention.png)
+
+Finally, an **analysis** performs a calculation with one or more products. For example, each of the 
+research questions in Proctor & Muller (2022) is implemented as an analysis.
+The parameters for products and analyses are specified in yaml files. 
+
+## References
+
+Proctor, C. & Muller, D. (2022). Joint visual attention and collaboration in Minecraft. In A. Weinberger, W. Chen, D. Hernández-Leo, & B. Chen (Eds.). (2022). *Proceedings of the 15th International Conference on Computer-Supported Collaborative Learning - CSCL 2022*. (pp. 226-233). Hiroshima, Japan: International Society of the Learning Sciences. (Best paper nomination. 46% accepted.)
