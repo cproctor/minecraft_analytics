@@ -88,7 +88,7 @@ gameplay from screen capture or Minecraft Replay, video and audio streams from Z
 transcripts, etc. When you specify the timestamp bounds of a segment, this package
 provides slices of all the cata streams corresponding to the segment. 
 
-![Diagram of a segment, specifying a time span across multiple data streams](segment.png)
+![Diagram of a segment, specifying a time span across multiple data streams](figures/segment.png)
 
 A **product** is defined as a transformation of data streams within a segment into 
 a desired representation. For example, `SegmentVideo` interleaves a video of gameplay
@@ -97,7 +97,7 @@ Other products are more abstract: `SegmentJointAttention` uses server logs of pl
 positions and gaze vectors to calculate and plot joint visual attention (see Proctor & Muller, 2022),
 as shown below.
 
-![Joint visual attention plot](w1g1_joint_attention.png)
+![Joint visual attention plot](figures/w1g1_joint_attention.png)
 
 Finally, an **analysis** performs a calculation with one or more products. For example, each of the 
 research questions in Proctor & Muller (2022) is implemented as an analysis.
