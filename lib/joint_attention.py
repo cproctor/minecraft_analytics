@@ -49,14 +49,16 @@ def joint_attention_schneider_pea_2013(df, key_a, key_b, distance_threshold=10, 
     windows = joint.rolling(str(window_seconds)+'s')
     return windows.max().astype(bool)
 
-def plot_boolean_joint_attention(df):
+def plot_boolean_joint_attention(df, colors=None):
     """Plots boolean values; returns figure
     """
+    if colors is None:
+        colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
     date_format = mdates.DateFormatter('%H:%M')
     fig, ax = plt.subplots(figsize=(6, 2))
     ax.xaxis.set_major_formatter(date_format)
-    fig.autofmt_xdate()
-    for col in df.columns:
+    #fig.autofmt_xdate()
+    for col, color in zip(df.columns, colors):
         times = df[df[col]].index
-        ax.scatter(x=times, y=[col] * len(times), marker='s')
+        ax.scatter(x=times, y=[col] * len(times), marker='s', color=color)
     return fig
