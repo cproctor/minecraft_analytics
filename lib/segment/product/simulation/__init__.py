@@ -68,14 +68,14 @@ class SegmentSimulation(SegmentLogs):
                         }
                     },
                     'params': {
-                        'center': self.get_bounding_box_center(),
                         'bounding_box': self.params['bounding_box']
                     }
                 }, fh)
 
     def get_cached_study_data_path(self):
+        ((x0, x1), (y0, y1), (z0, z1)) = self.params['bounding_box']
         start, end = self.get_start_end_times()
-        return Path("data/cache") / f"simulation-{start}-{end}.json"
+        return Path("data/cache") / f"simulation-{x0}-{x1}-{y0}-{y1}-{z0}-{z1}-{start}-{end}.json"
 
     def get_bounding_box_center(self):
         return [i0 + (i1 - i0) / 2 for i0, i1 in self.params['bounding_box']]
