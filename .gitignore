@@ -2,3 +2,4 @@
 *.swp
 **/__pycache__/*
 export/*
+lib/segment/product/simulation/js/node_modules/*

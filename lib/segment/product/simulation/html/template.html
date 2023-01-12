@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+      }
+      #simulation {
+        width: 100vw;
+        height: 100vh;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="simulation"></canvas>
+    <script>
+        window.DATA = {{study_json}};
+        {{simulation_js}}
+    </script>
+  </body>
+</html>
