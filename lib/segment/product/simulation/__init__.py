@@ -24,6 +24,7 @@ class SegmentSimulation(SegmentLogs):
     ]
 
     optional_params = [
+        "title",
         "use_cache",
         "debug",
     ]
@@ -47,6 +48,7 @@ class SegmentSimulation(SegmentLogs):
                 fh.write(template.render({
                     'simulation_js': simulation_js,
                     'study_json': study_json,
+                    'title': self.params.get('title', '')
                 }))
 
     def generate_study_data_json(self):

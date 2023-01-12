@@ -5,15 +5,26 @@
       body {
         margin: 0;
       }
+      h1 {
+        font-family: Helvetica;
+        position: absolute;
+        left: 20px;
+      }
       #simulation {
         width: 100vw;
-        height: 100vh;
+        height: 90vh;
         display: block;
+      }
+      #controls {
+        background-color: #333;
+        height: 10vh;
       }
     </style>
   </head>
   <body>
+    <h1>{{title}}</h1>
     <canvas id="simulation"></canvas>
+    <div id="controls"></div>
     <script>
         window.DATA = {{study_json}};
         {{simulation_js}}
