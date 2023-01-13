@@ -1,5 +1,7 @@
 from anvil import Region, Chunk
 from pathlib import Path
+from itertools import product
+from tqdm import tqdm
 import json
 
 class NullRegion:
@@ -30,13 +32,17 @@ class AnvilReader:
         ((self.x0, self.x1), (self.y0, self.y1), (self.z0, self.z1)) = bounding_box
         indices = []
         palette = {}
-        for y in range(self.y0, self.y1):
-            for z in range(self.z0, self.z1):
-                for x in range(self.x0, self.x1):
-                    material = self.get_voxel_material(x, y, z)
-                    if material not in palette:
-                        palette[material] = len(palette)
-                    indices.append(palette[material])
+        coord_iterator = product(
+            range(self.y0, self.y1), 
+            range(self.z0, self.z1), 
+            range(self.x0, self.x1)
+        )
+        total = (self.y1 - self.y0) * (self.z1 - self.z0) * (self.x1 - self.x0)
+        for y, z, x in tqdm(coord_iterator, total=total, desc="Reading voxel data"):
+            material = self.get_voxel_material(x, y, z)
+            if material not in palette:
+                palette[material] = len(palette)
+            indices.append(palette[material])
         palette_list = [m for i, m in sorted([(i, m) for m, i in palette.items()])]
         return indices, palette_list
 

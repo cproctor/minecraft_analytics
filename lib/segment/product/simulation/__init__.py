@@ -95,7 +95,12 @@ class SegmentSimulation(SegmentLogs):
     def get_cached_study_data_path(self):
         ((x0, x1), (y0, y1), (z0, z1)) = self.params['bounding_box']
         start, end = self.get_start_end_times()
-        cache_hash = md5(json.dumps(self.params, sort_keys=True).encode('utf-8')).hexdigest()
+        params = {
+            'p': self.params, 
+            'start': str(self.segment_params['start']), 
+            'duration': self.segment_params['duration']
+        }
+        cache_hash = md5(json.dumps(params, sort_keys=True).encode('utf-8')).hexdigest()
         return Path("data/cache") / f"simulation-{cache_hash}.json"
 
     def get_bounding_box_center(self):

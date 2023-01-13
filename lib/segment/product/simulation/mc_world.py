@@ -7,7 +7,7 @@ import pandas as pd
 from segment.product.simulation.anvil_reader import AnvilReader
 
 DEBUG = True
-DEBUG_NROWS = 10000
+DEBUG_NROWS = 100000
 
 class MinecraftWorldView:
     """Models part of Minecraft world, bounded by a 3D bounding box and a timespan.
