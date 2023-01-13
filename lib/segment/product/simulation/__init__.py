@@ -9,6 +9,7 @@ from jinja2 import FileSystemLoader, Environment
 import shutil
 from pathlib import Path
 import json
+from hashlib import md5
 from base64 import b64encode
 from segment.product.simulation.mc_world import MinecraftWorldView
 
@@ -21,6 +22,7 @@ class SegmentSimulation(SegmentLogs):
         "format",
         "export_filename",
         "bounding_box",
+        "layers",
     ]
 
     optional_params = [
@@ -52,7 +54,7 @@ class SegmentSimulation(SegmentLogs):
                 }))
 
     def generate_study_data_json(self):
-        if not (self.params.get("use_cache") and self.get_cached_study_data_path().exists()):
+        if not (self.params.get("use_cache", True) and self.get_cached_study_data_path().exists()):
             world = MinecraftWorldView(
                 self.initial_production_mca_path,
                 self.main_log_file,
@@ -62,22 +64,39 @@ class SegmentSimulation(SegmentLogs):
             )
             base_layer, palette = world.get_base_layer_at_start()
             with open(self.get_cached_study_data_path(), 'w') as fh:
-                json.dump({
-                    'layers': {
-                        'base': {
-                            'start': b64encode(bytes(base_layer)).decode('ascii'),
-                            'palette': palette
-                        }
-                    },
-                    'params': {
-                        'bounding_box': self.params['bounding_box']
-                    }
-                }, fh)
+                data = {}
+                data['params'] = {
+                  'bounding_box': self.params['bounding_box']
+                }
+                data['layers'] = {}
+                data['layers']['base'] = {
+                    'start': b64encode(bytes(base_layer)).decode('ascii'),
+                    'ops': [],
+                    'palette': palette
+                }
+                if self.params['layers'].get('water'):
+                    data['layers']['water'] = True
+                players_param = self.params['layers'].get('players')
+                if players_param:
+                    if isinstance(players_param, list):
+                        players = self.get_players_layer(players=players_param)
+                    else:
+                        players = self.get_players_layer(all_players=True)
+                    data['layers']['players'] = players
+                json.dump(data, fh)
+
+    def get_players_layer(self, players=None, all_players=False):
+        if not (players or all_players):
+            raise ValueError("player names or all_players must be specified")
+        if players and all_players:
+            raise ValueError("Player names and all_players cannot both be specified")
+        return []
 
     def get_cached_study_data_path(self):
         ((x0, x1), (y0, y1), (z0, z1)) = self.params['bounding_box']
         start, end = self.get_start_end_times()
-        return Path("data/cache") / f"simulation-{x0}-{x1}-{y0}-{y1}-{z0}-{z1}-{start}-{end}.json"
+        cache_hash = md5(json.dumps(self.params, sort_keys=True).encode('utf-8')).hexdigest()
+        return Path("data/cache") / f"simulation-{cache_hash}.json"
 
     def get_bounding_box_center(self):
         return [i0 + (i1 - i0) / 2 for i0, i1 in self.params['bounding_box']]
