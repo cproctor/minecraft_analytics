@@ -11,8 +11,10 @@
   "license": "ISC",
   "devDependencies": {
     "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "rollup-plugin-vue": "^6.0.0",
     "three": "^0.148.0",
     "three-orbit-controls": "^82.1.0",
-    "@rollup/plugin-node-resolve": "^15.0.1"
+    "vue": "^3.2.45"
   }
 }

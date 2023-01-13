@@ -37,7 +37,7 @@ class SegmentSimulation(SegmentLogs):
 
     def export(self):
         self.generate_study_data_json()
-        run('npm run build', cwd=self.here / 'js', shell=True, stdout=DEVNULL)
+        run('npm run build', cwd=self.here / 'js', shell=True)
         env = Environment(loader=FileSystemLoader(self.template_dir))
         template = env.get_template(self.template)
         simulation_js = self.bundle_path.read_text()

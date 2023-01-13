@@ -5,7 +5,7 @@
       body {
         margin: 0;
       }
-      h1 {
+      #titleblock {
         font-family: Helvetica;
         position: absolute;
         left: 20px;
@@ -15,16 +15,19 @@
         height: 90vh;
         display: block;
       }
-      #controls {
+      #timeline {
         background-color: #333;
         height: 10vh;
       }
     </style>
   </head>
   <body>
-    <h1>{{title}}</h1>
+    <div id="titleblock">
+      <h1>{{title}}</h1>
+      <p id="position"></p>
+    </div>
     <canvas id="simulation"></canvas>
-    <div id="controls"></div>
+    <div id="timeline"></div>
     <script>
         window.DATA = {{study_json}};
         {{simulation_js}}
