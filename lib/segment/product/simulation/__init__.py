@@ -75,7 +75,7 @@ class SegmentSimulation(SegmentLogs):
                     # Let's not worry about encoding right now. Too-soon optimization.
                     # 'start': b64encode(bytes(base_layer)).decode('ascii'),
                     'start': base_layer,
-                    'ops': [],
+                    'ops': world.get_base_layer_opsets(),
                     'palette': palette
                 }
                 if self.params['layers'].get('water'):

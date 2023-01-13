@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 from collections import defaultdict
 from segment.product.simulation.anvil_reader import AnvilReader
+from datetime import timedelta
 from tqdm import tqdm
 
 DEBUG = False
@@ -17,12 +18,17 @@ class MinecraftWorldView:
     to the world.
     """
 
+    base_layer = 0
+    air = "minecraft:air"
+    time_granularity = "1s"
+
     def __init__(self, mca_path, logfile, bounding_box, start, duration):
         self.mca_path = mca_path
         self.logfile = logfile
         self.bounding_box = bounding_box
         self.start = start
         self.duration = duration
+        self.end = self.start + timedelta(seconds=self.duration)
         self.ops_df = self.get_ops_df()
 
     def get_initial_base_layer(self):
@@ -31,9 +37,19 @@ class MinecraftWorldView:
         return blocks, palette
 
     def get_base_layer_at_start(self):
+        """Returns blocks and palette at the start of the segment.
+        Also iterates through the ops we will encounter during the segment
+        to ensure a consistent order in the palette.
+        """
         blocks, palette = self.get_initial_base_layer()
-        for op in self.get_base_layer_ops_before_start():
+        for ts, row in self.get_base_layer_ops_df("before").iterrows():
+            op = self.base_layer_series_to_op(row)
             self.update_base_layer(blocks, palette, op)
+        for ts, row in self.get_base_layer_ops_df("during").iterrows():
+            op = self.base_layer_series_to_op(row)
+            layer, location, before, after = op
+            if after not in palette:
+                palette.append(after)
         return blocks, palette
 
     def update_base_layer(self, blocks, palette, op):
@@ -50,10 +66,31 @@ class MinecraftWorldView:
         ((x0, x1), (y0, y1), (z0, z1)) = self.bounding_box
         return (y-y0)*(x1-x0)*(z1-z0) + (z-z0)*(x1-x0) + (x-x0)
 
-    def get_base_layer_ops_before_start(self):
-        """Yields ops for the base layer.
+    def base_layer_series_to_op(self, series):
+        """Converts a df series (row) to an op, a list like (layer, location, before, after).
         """
-        ops = self.ops_df.loc[self.ops_df.index <= self.start]
+        location = (series.location_x, series.location_y, series.location_z)
+        if series.event == 'BlockBreakEvent':
+            return (self.base_layer, location, series.block, self.air)
+        elif series.event == 'BlockPlaceEvent':
+            return (self.base_layer, location, self.air, series.block)
+
+    def get_base_layer_opsets(self):
+        opsets = []
+        timesteps = self.get_base_layer_ops_df("during").resample(self.time_granularity)
+        for group_ts in timesteps.groups.keys():
+            try:
+                rows = timesteps.get_group(group_ts)
+                opset = [self.base_layer_series_to_op(row) for ts, row in rows.iterrows()]
+                opsets.append(opset)
+            except KeyError:
+                opsets.append([])
+        return opsets
+
+    def get_base_layer_ops_df(self, when=None):
+        """Given an ops df, filters out relevant the base layer ops.
+        """
+        ops = self.ops_df
         ops = ops[ops.event.isin(['BlockBreakEvent', 'BlockPlaceEvent'])]
         ops['location_x'] = ops.location_x.astype(int)
         ops['location_y'] = ops.location_y.astype(int)
@@ -63,15 +100,12 @@ class MinecraftWorldView:
         ops = ops[(y0 <= ops.location_y) & (ops.location_y < y1)]
         ops = ops[(z0 <= ops.location_z) & (ops.location_z < z1)]
 
-        base_layer = 0
-        air = "minecraft:air"
-
-        for ts, op in tqdm(ops.iterrows(), desc="Applying past ops", total=len(ops)):
-            location = (op.location_x, op.location_y, op.location_z)
-            if op.event == 'BlockBreakEvent':
-                yield (base_layer, location, op.block, air)
-            elif op.event == 'BlockPlaceEvent':
-                yield (base_layer, location, air, op.block)
+        if when == "before":
+            ops = ops[ops.index < self.start]
+        elif when == "during":
+            ops = ops[self.start <= ops.index]
+            ops = ops[ops.index < self.end]
+        return ops
 
     def get_ops_df(self):
         relevant_event_types = [
