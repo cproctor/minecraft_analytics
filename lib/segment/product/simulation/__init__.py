@@ -70,7 +70,11 @@ class SegmentSimulation(SegmentLogs):
                 }
                 data['layers'] = {}
                 data['layers']['base'] = {
-                    'start': b64encode(bytes(base_layer)).decode('ascii'),
+                    # TODO: RE-IMEPLEMENT B64 ENCODING. 
+                    # The problem was that the size of the palette got too big. 
+                    # Let's not worry about encoding right now. Too-soon optimization.
+                    # 'start': b64encode(bytes(base_layer)).decode('ascii'),
+                    'start': base_layer,
                     'ops': [],
                     'palette': palette
                 }

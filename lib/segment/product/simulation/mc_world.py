@@ -4,10 +4,12 @@
 
 from pathlib import Path
 import pandas as pd
+from collections import defaultdict
 from segment.product.simulation.anvil_reader import AnvilReader
+from tqdm import tqdm
 
-DEBUG = True
-DEBUG_NROWS = 100000
+DEBUG = False
+DEBUG_NROWS = 1000000
 
 class MinecraftWorldView:
     """Models part of Minecraft world, bounded by a 3D bounding box and a timespan.
@@ -36,14 +38,14 @@ class MinecraftWorldView:
 
     def update_base_layer(self, blocks, palette, op):
         layer, location, before, after = op
-        if self.in_bounding_box(*location):
-            if after not in palette:
-                palette.append(after)
-            offset = self.get_base_layer_offset(*location)
-            blocks[offset] = palette.index(after)
+        if after not in palette:
+            palette.append(after)
+        offset = self.get_base_layer_offset(*location)
+        blocks[offset] = palette.index(after)
 
     def get_base_layer_offset(self, x, y, z):
-        """The base layer is represented as a list of integers, ordered by y/z/x.
+        """Returns the list index for voxel (x, y, z) in 
+        The base layer is represented as a list of integers, ordered by y/z/x.
         """
         ((x0, x1), (y0, y1), (z0, z1)) = self.bounding_box
         return (y-y0)*(x1-x0)*(z1-z0) + (z-z0)*(x1-x0) + (x-x0)
@@ -51,15 +53,24 @@ class MinecraftWorldView:
     def get_base_layer_ops_before_start(self):
         """Yields ops for the base layer.
         """
-        past_ops = self.ops_df.loc[self.ops_df.index <= self.start]
+        ops = self.ops_df.loc[self.ops_df.index <= self.start]
+        ops = ops[ops.event.isin(['BlockBreakEvent', 'BlockPlaceEvent'])]
+        ops['location_x'] = ops.location_x.astype(int)
+        ops['location_y'] = ops.location_y.astype(int)
+        ops['location_z'] = ops.location_z.astype(int)
+        ((x0, x1), (y0, y1), (z0, z1)) = self.bounding_box
+        ops = ops[(x0 <= ops.location_x) & (ops.location_x < x1)]
+        ops = ops[(y0 <= ops.location_y) & (ops.location_y < y1)]
+        ops = ops[(z0 <= ops.location_z) & (ops.location_z < z1)]
+
         base_layer = 0
         air = "minecraft:air"
-        for ts, op in past_ops.iterrows():
+
+        for ts, op in tqdm(ops.iterrows(), desc="Applying past ops", total=len(ops)):
+            location = (op.location_x, op.location_y, op.location_z)
             if op.event == 'BlockBreakEvent':
-                location = (op.target_block_x, op.target_block_y, op.target_block_z)
                 yield (base_layer, location, op.block, air)
             elif op.event == 'BlockPlaceEvent':
-                location = (op.target_block_x, op.target_block_y, op.target_block_z)
                 yield (base_layer, location, air, op.block)
 
     def get_ops_df(self):
@@ -76,8 +87,4 @@ class MinecraftWorldView:
             nrows = DEBUG_NROWS if DEBUG else None,
         )
         ops = ops[ops.event.isin(relevant_event_types)]
-        ops = ops[~ops.target_block_x.isnull()]
-        ops['target_block_x'] = ops['target_block_x'].astype(int)
-        ops['target_block_y'] = ops['target_block_y'].astype(int)
-        ops['target_block_z'] = ops['target_block_z'].astype(int)
         return ops
