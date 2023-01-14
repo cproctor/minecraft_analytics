@@ -22,6 +22,7 @@ class AnvilReader:
 
     REGION_LENGTH = 512
     CHUNK_LENGTH = 16
+    VOID = 'meta:void'
 
     def __init__(self, source_path):
         self.source_path = Path(source_path)
@@ -31,7 +32,7 @@ class AnvilReader:
     def read(self, bounding_box):
         ((self.x0, self.x1), (self.y0, self.y1), (self.z0, self.z1)) = bounding_box
         indices = []
-        palette = {}
+        palette = {self.VOID: 0}
         coord_iterator = product(
             range(self.y0, self.y1), 
             range(self.z0, self.z1), 
