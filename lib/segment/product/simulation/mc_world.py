@@ -43,11 +43,11 @@ class MinecraftWorldView:
         """
         blocks, palette = self.get_initial_base_layer()
         for ts, row in self.get_base_layer_ops_df("before").iterrows():
-            op = self.base_layer_series_to_op(row)
+            op = self.base_layer_series_to_op(ts, row)
             self.update_base_layer(blocks, palette, op)
         for ts, row in self.get_base_layer_ops_df("during").iterrows():
-            op = self.base_layer_series_to_op(row)
-            layer, location, before, after = op
+            op = self.base_layer_series_to_op(ts, row)
+            ts, location, before, after = op
             if after not in palette:
                 palette.append(after)
         return blocks, palette
@@ -66,26 +66,18 @@ class MinecraftWorldView:
         ((x0, x1), (y0, y1), (z0, z1)) = self.bounding_box
         return (y-y0)*(x1-x0)*(z1-z0) + (z-z0)*(x1-x0) + (x-x0)
 
-    def base_layer_series_to_op(self, series):
+    def base_layer_series_to_op(self, ts, series):
         """Converts a df series (row) to an op, a list like (layer, location, before, after).
         """
         location = (series.location_x, series.location_y, series.location_z)
         if series.event == 'BlockBreakEvent':
-            return (self.base_layer, location, series.block, self.air)
+            return (str(ts), location, series.block, self.air)
         elif series.event == 'BlockPlaceEvent':
-            return (self.base_layer, location, self.air, series.block)
+            return (str(ts), location, self.air, series.block)
 
-    def get_base_layer_opsets(self):
-        opsets = []
-        timesteps = self.get_base_layer_ops_df("during").resample(self.time_granularity)
-        for group_ts in timesteps.groups.keys():
-            try:
-                rows = timesteps.get_group(group_ts)
-                opset = [self.base_layer_series_to_op(row) for ts, row in rows.iterrows()]
-                opsets.append(opset)
-            except KeyError:
-                opsets.append([])
-        return opsets
+    def get_base_layer_opset(self):
+        df = self.get_base_layer_ops_df("during")
+        return [self.base_layer_series_to_op(ts, row) for ts, row in df.iterrows()]
 
     def get_base_layer_ops_df(self, when=None):
         """Given an ops df, filters out relevant the base layer ops.

@@ -17,7 +17,6 @@ class SegmentSimulation(SegmentLogs):
     """A three.js simulation.
     - Use the full log to compute the world's initial state.
     """
-
     expected_params = [
         "format",
         "export_filename",
@@ -69,24 +68,18 @@ class SegmentSimulation(SegmentLogs):
                   'bounding_box': self.params['bounding_box']
                 }
                 data['layers'] = {}
-                data['layers']['base'] = {
-                    # TODO: RE-IMEPLEMENT B64 ENCODING. 
-                    # The problem was that the size of the palette got too big. 
-                    # Let's not worry about encoding right now. Too-soon optimization.
-                    # 'start': b64encode(bytes(base_layer)).decode('ascii'),
-                    'start': base_layer,
-                    'ops': world.get_base_layer_opsets(),
-                    'palette': palette
+                data['layers']['terrain'] = {
+                    "type": "terrain",
+                    "initial": [base_layer, palette],
+                    "ops": world.get_base_layer_opset(),
                 }
-                if self.params['layers'].get('water'):
-                    data['layers']['water'] = True
-                players_param = self.params['layers'].get('players')
-                if players_param:
-                    if isinstance(players_param, list):
-                        players = self.get_players_layer(players=players_param)
-                    else:
-                        players = self.get_players_layer(all_players=True)
-                    data['layers']['players'] = players
+                #players_param = self.params['layers'].get('players')
+                #if players_param:
+                    #if isinstance(players_param, list):
+                        #players = self.get_players_layer(players=players_param)
+                    #else:
+                        #players = self.get_players_layer(all_players=True)
+                    #data['layers']['players'] = players
                 json.dump(data, fh)
 
     def get_players_layer(self, players=None, all_players=False):
