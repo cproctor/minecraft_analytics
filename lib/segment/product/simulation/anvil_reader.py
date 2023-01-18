@@ -12,17 +12,32 @@ class NullChunk:
         return NullBlock()
 
 class NullBlock:
-    namespace = "meta"
-    id = ''
+    namespace = "minecraft"
+    id = 'air'
 
 class AnvilReader:
-    """Reads out a region described by the bounding box, and returns an array of integers
-    indexing materials. 
+    """Reads out a region described by the bounding box, and returns a representation of
+    the region's materials. The format is as follows: 
+
+        - An array of ascending y-indexed planes is returned, along with the palette.
+          y-values are inferred by the y-index of the plane.
+        - Each plane is a list: [method, data]
+        - When method is 'sparse', data is a list of (z, x, m) values.
+        - When method is 'dense', data is an ascending (z, x) indexed m values. 
+        - x, y, and z-values are relative to the bounding box.
+        - m values represent the index of a material in palette.
+        - minecraft:cave_air is mapped to minecraft:air (palette index 0) to make its
+          truthiness consistent.
+
+    The rationale behind this format is that the density (ratio of non-air pixels) varies
+    greatly by y. For less-dense planes, a sparse representation is much more efficient. 
+    For more-dense planes, a dense representation is much more efficient. The cutoff
+    density can be adjusted using MAX_SPARSE_DENSITY.
     """
 
     REGION_LENGTH = 512
     CHUNK_LENGTH = 16
-    VOID = 'meta:void'
+    MAX_SPARSE_DENSITY = 0.3
 
     def __init__(self, source_path):
         self.source_path = Path(source_path)
@@ -30,26 +45,35 @@ class AnvilReader:
         self.chunks = {}
 
     def read(self, bounding_box):
-        ((self.x0, self.x1), (self.y0, self.y1), (self.z0, self.z1)) = bounding_box
-        indices = []
-        palette = {self.VOID: 0}
-        coord_iterator = product(
-            range(self.y0, self.y1), 
-            range(self.z0, self.z1), 
-            range(self.x0, self.x1)
-        )
-        total = (self.y1 - self.y0) * (self.z1 - self.z0) * (self.x1 - self.x0)
-        for y, z, x in tqdm(coord_iterator, total=total, desc="Reading voxel data"):
-            material = self.get_voxel_material(x, y, z)
-            if material not in palette:
-                palette[material] = len(palette)
-            indices.append(palette[material])
+        ((x0, x1), (y0, y1), (z0, z1)) = bounding_box
+        blocks = []
+        palette = {'minecraft:air': 0}
+        volume = (y1 - y0) * (z1 - z0) * (x1 - x0)
+        with tqdm(total=volume, desc="Reading voxels") as progress_bar:
+            for y in range(y0, y1):
+                plane = []
+                for z in range(z0, z1):
+                    for x in range(x0, x1):
+                        progress_bar.update(1)
+                        material = self.get_voxel_material(x0+x, y0+y, z0+z)
+                        if material not in palette:
+                            palette[material] = len(palette)
+                        plane.append((z, x, palette[material]))
+                sparse = [[z, x, m] for z, x, m in plane if m]
+                plane_area = (z1 - z0) / (x1 - x0)
+                density = len(sparse) / plane_area
+                if density <= self.MAX_SPARSE_DENSITY:
+                    blocks.append(["sparse", sparse])
+                else:
+                    blocks.append(["dense", [m for z, x, m in plane]])
         palette_list = [m for i, m in sorted([(i, m) for m, i in palette.items()])]
-        return indices, palette_list
+        return blocks, palette_list
 
     def get_voxel_material(self, x, y, z):
         chunk = self.get_chunk(x, y, z)
         block = chunk.get_block(x % 16, y, z % 16)
+        if block.id == 'cave_air': 
+            block.id = 'air'
         return f"{block.namespace}:{block.id}"
 
     def get_chunk(self, x, y, z):
@@ -92,6 +116,9 @@ class AnvilReader:
         """
         rx, rz = x % self.REGION_LENGTH, z % self.REGION_LENGTH
         return rx // self.CHUNK_LENGTH, rz // self.CHUNK_LENGTH
+
+    def is_air(self, material):
+        return material == "minecraft:air" or material == "minecraft:cave_air"
 
 def usage_demo():
     mc_path = "/Users/chrisp/Repos/MinecraftUtopia/minecraft-analytics/data/server/production-original/region"

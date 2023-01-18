@@ -11,6 +11,7 @@ from pathlib import Path
 import json
 from hashlib import md5
 from base64 import b64encode
+from collections import defaultdict
 from segment.product.simulation.mc_world import MinecraftWorldView
 
 class SegmentSimulation(SegmentLogs):
@@ -35,6 +36,7 @@ class SegmentSimulation(SegmentLogs):
     template_dir = here / 'html'
     template = 'template.html'
     initial_production_mca_path = "data/server/production-original/region"
+    world_height = 256
 
     def export(self):
         self.generate_study_data_json()
@@ -61,7 +63,7 @@ class SegmentSimulation(SegmentLogs):
                 self.segment_params['start'],
                 self.segment_params['duration'],
             )
-            base_layer, palette = world.get_base_layer_at_start()
+            voxels, palette = world.get_base_layer_at_start()
             with open(self.get_cached_study_data_path(), 'w') as fh:
                 data = {}
                 data['params'] = {
@@ -70,7 +72,7 @@ class SegmentSimulation(SegmentLogs):
                 data['layers'] = {}
                 data['layers']['terrain'] = {
                     "type": "terrain",
-                    "initial": [base_layer, palette],
+                    "initial": [voxels, palette],
                     "ops": world.get_base_layer_opset(),
                 }
                 #players_param = self.params['layers'].get('players')
