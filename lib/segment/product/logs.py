@@ -33,7 +33,7 @@ class SegmentLogs(SegmentProduct):
 
     def get_cached_log_path(self):
         start, end = self.get_start_end_times()
-        return Path("data/cache") / f"{start}-{end}.csv"
+        return Path("data/cache") / f"logs_{start}-{end}.csv"
 
     def get_start_end_times(self):
         "Returns (start, end) times"
