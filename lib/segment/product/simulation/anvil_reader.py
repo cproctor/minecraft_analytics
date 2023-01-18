@@ -55,10 +55,10 @@ class AnvilReader:
                 for z in range(z0, z1):
                     for x in range(x0, x1):
                         progress_bar.update(1)
-                        material = self.get_voxel_material(x0+x, y0+y, z0+z)
+                        material = self.get_voxel_material(x, y, z)
                         if material not in palette:
                             palette[material] = len(palette)
-                        plane.append((z, x, palette[material]))
+                        plane.append((z - z0, x - x0, palette[material]))
                 sparse = [[z, x, m] for z, x, m in plane if m]
                 plane_area = (z1 - z0) / (x1 - x0)
                 density = len(sparse) / plane_area
