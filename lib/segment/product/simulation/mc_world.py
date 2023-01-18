@@ -106,7 +106,7 @@ class MinecraftWorldView:
         elif when == "during":
             ops = ops[self.start <= ops.index]
             ops = ops[ops.index < self.end]
-        return ops
+        return ops.sort_index()
 
     def get_ops_df(self):
         relevant_event_types = [
