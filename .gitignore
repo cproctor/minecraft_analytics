@@ -3,3 +3,4 @@
 **/__pycache__/*
 export/*
 lib/segment/product/simulation/js/node_modules/*
+lib/segment/product/simulation/js/bundle.js
