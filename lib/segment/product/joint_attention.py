@@ -2,6 +2,8 @@ from inspect import signature
 from itertools import combinations
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
+from matplotlib.colors import ListedColormap
 from datetime import timedelta
 from segment.product.logs import SegmentLogs
 from joint_attention import (
@@ -30,6 +32,7 @@ class SegmentJointAttention(SegmentLogs):
         "distance_threshold",
         "window_seconds",
         "plot_title",
+        "palette",
     ]
     default_plot_title = "Joint Visual Attention"
     default_distance_threshold = 6
@@ -77,7 +80,12 @@ class SegmentJointAttention(SegmentLogs):
             player_name_cols = [self.params['players'][k0] + '-' + self.params['players'][k1] for k0, k1 in keypairs]
             label_cols = [k0 + '-' + k1 for k0, k1 in keypairs]
             result = result[player_name_cols].rename(columns=dict(zip(player_name_cols, label_cols)))
-            fig = plot_boolean_joint_attention(result)
+            plt_kwargs = {}
+            if self.params.get("palette"):
+                colors = sns.color_palette(self.params["palette"]).as_hex()
+            else:
+                colors = None
+            fig = plot_boolean_joint_attention(result, colors)
             plt.title(self.params.get('plot_title', self.default_plot_title))
             plt.ylim([-0.5, len(result.columns) - 0.5])
             fig.savefig(figfile, bbox_inches='tight')
