@@ -79,6 +79,8 @@ class JointAttentionCollaborationModel(BaseModel):
 
         if categorical:
             bp = sns.barplot(x="collaboration_score", y="percentage_jva", data=df)
+            plt.xlabel("Collaboration level")
+            plt.ylabel("Percentage of segment spent in JVA")
             bp.figure.savefig(self.export_dir() / (self.export_base_name + ".png"))
             test = ttest_ind(
                 df[df.collaboration_score == "low"].percentage_jva,
@@ -86,7 +88,6 @@ class JointAttentionCollaborationModel(BaseModel):
                 alternative="less",
                 equal_var=False,
             )
-            print(test)
         else:
             lm = sns.lmplot(x="percentage_jva", y="collaboration_score", data=df)
             ax = lm.axes[0, 0]
