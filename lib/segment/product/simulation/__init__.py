@@ -4,6 +4,7 @@
 #   - Drop it into the template.
 
 from subprocess import run, DEVNULL
+from collections.abc import Iterator
 from segment.product.logs import SegmentLogs
 from jinja2 import FileSystemLoader, Environment
 import shutil
@@ -12,7 +13,18 @@ import json
 from hashlib import md5
 from base64 import b64encode
 from collections import defaultdict
+from datetime import timedelta
 from segment.product.simulation.mc_world import MinecraftWorldView
+
+def tuples(iterator):
+    """Yields pairs of items.
+    """
+    if not isinstance(iterator, Iterator):
+        iterator = iter(iterator)
+    item0 = next(iterator)
+    for item1 in iterator:
+        yield item0, item1
+        item0 = item1
 
 class SegmentSimulation(SegmentLogs):
     """A three.js simulation.
@@ -55,41 +67,92 @@ class SegmentSimulation(SegmentLogs):
                 }))
 
     def generate_study_data_json(self):
-        if not (self.params.get("use_cache", True) and self.get_cached_study_data_path().exists()):
-            world = MinecraftWorldView(
-                self.initial_production_mca_path,
-                self.main_log_file,
-                self.params['bounding_box'],
-                self.segment_params['start'],
-                self.segment_params['duration'],
-            )
-            voxels, palette = world.get_base_layer_at_start()
-            with open(self.get_cached_study_data_path(), 'w') as fh:
-                data = {}
-                data['params'] = {
-                  'bounding_box': self.params['bounding_box']
-                }
-                data['layers'] = {}
-                data['layers']['terrain'] = {
-                    "type": "terrain",
-                    "initial": [voxels, palette],
-                    "ops": world.get_base_layer_opset(),
-                }
-                #players_param = self.params['layers'].get('players')
-                #if players_param:
-                    #if isinstance(players_param, list):
-                        #players = self.get_players_layer(players=players_param)
-                    #else:
-                        #players = self.get_players_layer(all_players=True)
-                    #data['layers']['players'] = players
-                json.dump(data, fh)
+        if self.params.get("use_cache", True) and self.get_cached_study_data_path().exists():
+            return
+        world = MinecraftWorldView(
+            self.initial_production_mca_path,
+            self.main_log_file,
+            self.params['bounding_box'],
+            self.segment_params['start'],
+            self.segment_params['duration'],
+        )
+        data = {}
+        data['params'] = {
+            'bounding_box': self.params['bounding_box']
+        }
+        data['layers'] = {}
+        data['layers']['terrain'] = self.get_terrain_layer(world)
+        p_param = self.params['layers'].get('players')
+        if p_param == 'all':
+            p_df = self.filter_players_df(world.ops_df)
+            p_layer = self.get_players_layer(p_df, all_players=True)
+        elif isinstance(self.params['layers']['players'], list):
+            p_layer = self.get_players_layer(p_df, players=p_param)
+        else:
+            raise ValueError(f"Invalid players layer arg: {p_param}")
+        data['layers']['players'] = p_layer
+        with open(self.get_cached_study_data_path(), 'w') as fh:
+            json.dump(data, fh)
 
-    def get_players_layer(self, players=None, all_players=False):
+    def filter_players_df(self, df):
+        start = self.segment_params['start']
+        end = start + timedelta(seconds=self.segment_params['duration'])
+        df = df[df.event == 'PlayerMoveEvent']
+        df['location_x'] = df.location_x.astype(int)
+        df['location_y'] = df.location_y.astype(int)
+        df['location_z'] = df.location_z.astype(int)
+        ((x0, x1), (y0, y1), (z0, z1)) = self.params['bounding_box']
+        df = df[(x0 <= df.location_x) & (df.location_x < x1)]
+        df = df[(y0 <= df.location_y) & (df.location_y < y1)]
+        df = df[(z0 <= df.location_z) & (df.location_z < z1)]
+        df = df[start <= df.index]
+        df = df[df.index < end]
+        return df.sort_index()
+
+    def get_terrain_layer(self, world):
+        voxels, palette = world.get_base_layer_at_start()
+        return {
+            "type": "terrain",
+            "initial": [voxels, palette],
+            "ops": world.get_base_layer_opset(),
+        }
+
+    def get_players_layer(self, df, players=None, all_players=False):
         if not (players or all_players):
             raise ValueError("player names or all_players must be specified")
         if players and all_players:
             raise ValueError("Player names and all_players cannot both be specified")
-        return []
+        if players:
+            df = df[df.player.isin(players)]
+        initial = {}
+        grouper = df.groupby('player')
+        for name, row in grouper.first().iterrows():
+            initial[name] = self.row_to_player_state(row)
+        ops = {}
+        for name, index in df.groupby('player').groups.items():
+            ops[name] = self.get_player_ops(df.loc[index])
+        return {
+            "type": "players",
+            "initial": initial,
+            "ops": ops
+        }
+
+    def get_player_ops(self, df):
+        ops = []
+        for (ts0, row0), (ts1, row1) in tuples(df.iterrows()):
+            ops.append([
+                str(ts1), 
+                self.row_to_player_state(row0), 
+                self.row_to_player_state(row1)
+            ])
+        return ops
+
+    def row_to_player_state(self, row):
+        return {
+            "position": [row.location_x, row.location_y, row.location_z],
+            "eyeDirection": [row.eye_direction_pitch, row.eye_direction_yaw],
+            "eyeTarget": [row.target_block_x, row.target_block_y, row.target_block_z]
+        }
 
     def get_cached_study_data_path(self):
         ((x0, x1), (y0, y1), (z0, z1)) = self.params['bounding_box']

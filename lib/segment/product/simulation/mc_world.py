@@ -88,6 +88,8 @@ class MinecraftWorldView:
         df = self.get_base_layer_ops_df("during")
         return [self.base_layer_series_to_op(ts, row) for ts, row in df.iterrows()]
 
+    # TODO This should be part of SimulationProduct, not MCWorld
+    # Pass in the cleaned df.
     def get_base_layer_ops_df(self, when=None):
         """Given an ops df, filters out relevant the base layer ops.
         """
