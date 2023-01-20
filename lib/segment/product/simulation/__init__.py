@@ -76,9 +76,12 @@ class SegmentSimulation(SegmentLogs):
             self.segment_params['start'],
             self.segment_params['duration'],
         )
+        start = self.segment_params['start']
+        end = start + timedelta(seconds=self.segment_params['duration'])
         data = {}
         data['params'] = {
-            'bounding_box': self.params['bounding_box']
+            'bounding_box': self.params['bounding_box'],
+            'timespan': [str(start), str(end)]
         }
         data['layers'] = {}
         data['layers']['terrain'] = self.get_terrain_layer(world)
