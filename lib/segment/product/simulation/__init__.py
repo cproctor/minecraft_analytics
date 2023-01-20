@@ -90,6 +90,7 @@ class SegmentSimulation(SegmentLogs):
             p_df = self.filter_players_df(world.ops_df)
             p_layer = self.get_players_layer(p_df, all_players=True)
         elif isinstance(self.params['layers']['players'], list):
+            p_df = self.filter_players_df(world.ops_df)
             p_layer = self.get_players_layer(p_df, players=p_param)
         else:
             raise ValueError(f"Invalid players layer arg: {p_param}")
