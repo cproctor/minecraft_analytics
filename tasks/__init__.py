@@ -65,8 +65,12 @@ def interact(c, world, minecraft_username=None):
     else:
         df_fn = world + ".csv"
     df_path = Path(c.local.dataframe_path) / df_fn
-    df = pd.read_csv(Path(c.local.dataframe_path) / df_fn,
-            index_col="timestamp", parse_dates=["timestamp"])
+    df = pd.read_csv(
+        Path(c.local.dataframe_path) / df_fn,
+        index_col="timestamp", 
+        parse_dates=["timestamp"],
+        date_parser=lambda x: pd.to_datetime(x, utc=True),
+    )
     print("Synced dataframe is bound to `df`")
     code.interact(local=locals())
 

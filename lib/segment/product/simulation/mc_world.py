@@ -120,6 +120,7 @@ class MinecraftWorldView:
             Path(self.logfile), 
             index_col="timestamp", 
             parse_dates=["timestamp"], 
+            date_parser=lambda x: pd.to_datetime(x, utc=True),
             low_memory=False,
             nrows = DEBUG_NROWS if DEBUG else None,
         )
