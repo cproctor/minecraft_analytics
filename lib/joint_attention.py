@@ -45,7 +45,7 @@ def joint_attention_schneider_pea_2013(df, key_a, key_b, distance_threshold=10, 
     Richardson & Dale, 2005. 
     """
     dist = distance_measure(df, key_a, key_b, 'target_block')
-    joint = dist ** 2 <= distance_threshold
+    joint = dist ** 2 <= distance_threshold # CP note (2023-01-20) Why is dist squared?
     windows = joint.rolling(str(window_seconds)+'s')
     return windows.max().astype(bool)
 
