@@ -104,6 +104,20 @@ Finally, an **analysis** performs a calculation with one or more products. For e
 research questions in Proctor & Muller (2022) is implemented as an analysis.
 The parameters for products and analyses are specified in yaml files. 
 
+## TODO
+
+- In the simulation product:
+  - Develop a UI with a playhead, allowing scrubbing across time
+  - Add an annotation layer for qualitative coding
+  - Add audio layer
+  - Add a transcript layer with a plumbob, and possibly sidebar transcript.
+  - Add JVA layer
+- In the task definitions: 
+  - Only import what's needed for each task. 
+
 ## References
 
 Proctor, C. & Muller, D. (2022). Joint visual attention and collaboration in Minecraft. In A. Weinberger, W. Chen, D. Hernández-Leo, & B. Chen (Eds.). (2022). *Proceedings of the 15th International Conference on Computer-Supported Collaborative Learning - CSCL 2022*. (pp. 226-233). Hiroshima, Japan: International Society of the Learning Sciences. (Best paper nomination. 46% accepted.)
+
+Proctor, C. & Mawer, D. (2023). MultiMod: A platform for qualitative analysis of multimodal learning
+analytics. In *Building knowledge and sustaining our community, Proceedings of the 16th International Conference on Computer-Supported Collaborative Learning - CSCL 2023.* Montreal, Canada: International Society of the Learning Sciences.
