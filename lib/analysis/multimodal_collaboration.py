@@ -64,7 +64,10 @@ class MultimodalCollaborationModel(BaseModel):
         df = pd.concat(dfs)
         df.to_csv(self.export_dir() / (self.export_base_name + ".csv"))
 
-        bp = sns.barplot(x="collaboration_score", hue="jva", y="block_actions", data=df)
+        df["jva_labeled"] = df.jva.apply(lambda jva: "JVA" if jva else "No JVA")
+        bp = sns.barplot(hue="collaboration_score", x="jva_labeled", y="block_actions", data=df, palette="viridis")
+        plt.ylabel("Block actions per second")
+        plt.xlabel("")
         bp.figure.savefig(self.export_dir() / (self.export_base_name + ".png"))
 
         high_delta = self.mean_block_actions(df, "high", True) - self.mean_block_actions(df, "high", False)
