@@ -61,14 +61,14 @@ class SegmentCrossRecurrenceAugmented(SegmentCrossRecurrence):
             extent = mdates.date2num(time_bounds * 2)
 
             if player0 in badf.columns:
-                axtop.plot(badf.index, badf[player0])
+                axtop.plot(badf.index, badf[player0], color='#365c8d')
             else:
                 axtop.plot(badf.index, zeros)
             axtop.axes.get_xaxis().set_visible(False)
             axtop.set_xlim(time_bounds)
             axtop.set_ylabel("Block edits")
             if player1 in badf.columns:
-                axright.plot(badf[player1], badf.index)
+                axright.plot(badf[player1], badf.index, color='#277f8e')
             else:
                 axright.plot(zeros, badf.index)
             axright.axes.get_yaxis().set_visible(False)
