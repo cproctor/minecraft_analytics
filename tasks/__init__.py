@@ -3,21 +3,9 @@ from pathlib import Path
 import code
 import sys
 import yaml
-import pandas as pd
-import numpy as np
 from datetime import datetime, timedelta
 
 sys.path.append("lib")
-
-from logs.reader import LogReader
-from segment import Segment
-from metadata import (
-    get_metadata_df, 
-    get_media_metadata, 
-    METADATA_SUFFIX, 
-    ts2s,
-)
-from analysis import MODELS
 
 @task(help={
     "world": "name of world",
@@ -27,6 +15,8 @@ from analysis import MODELS
 })
 def sync(c, world, minecraft_username=None, dataframe=True, interact=False):
     "Sync logs from the server to local filesystem"
+    from logs.reader import LogReader
+
     remote_path = Path(c.minecraft_server.mscs_dir) / "worlds" / world / "plugins" / "SuperLog" / "logs"
     local_path = Path(c.local.logs_path) / world
     if minecraft_username:
@@ -60,6 +50,8 @@ def sync(c, world, minecraft_username=None, dataframe=True, interact=False):
 })
 def interact(c, world, minecraft_username=None):
     "Drop into interactive console with the selected dataframe loaded"
+    import pandas as pd
+
     if minecraft_username:
         df_fn = world + "_" + minecraft_username + ".csv"
     else:
@@ -77,6 +69,8 @@ def interact(c, world, minecraft_username=None):
 @task
 def export_segment(c, params_file, clean=False, dryrun=False):
     "Export a segment as speficied by a params file"
+    from segment import Segment
+
     pf = Path(params_file)
     if not pf.exists():
         raise ValueError("{} does not exist".format(pf))
@@ -88,6 +82,10 @@ def export_segment(c, params_file, clean=False, dryrun=False):
 @task
 def manifest(c, time=None, interact=False):
     "List and filter media assets"
+    import numpy as np
+    import pandas as pd
+    from metadata import get_metadata_df
+
     if time:
         time = np.datetime64(time)
     df = get_metadata_df(c.local.data_path, time=time)
@@ -101,6 +99,9 @@ def manifest(c, time=None, interact=False):
 def localize(c, time, media_path, duration=None, end=None, reverse=False):
     """Convert a UTC timestamp to relative local time within a media path. 
     """
+    import pandas as pd
+    from metadata import get_media_metadata, ts2s, METADATA_SUFFIX
+
     if duration and end:
         raise ValueError("Must not specify duration and end")
 
@@ -146,6 +147,8 @@ def localize(c, time, media_path, duration=None, end=None, reverse=False):
 @task
 def analysis(c, params_file, clean=False):
     "Compute named analysis"
+    from analysis import MODELS
+
     pf = Path(params_file)
     if not pf.exists():
         raise ValueError("{} does not exist".format(pf))
