@@ -4,6 +4,9 @@
     <style>
       body {
         margin: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
       #titleblock {
         font-family: Helvetica;
@@ -12,12 +15,13 @@
       }
       #simulation {
         width: 100vw;
-        height: 90vh;
         display: block;
+        flex-grow: 1;
       }
-      #timeline {
+      #controls {
         background-color: #333;
-        height: 10vh;
+        height: 150px;
+        display: flex;
       }
     </style>
   </head>
@@ -30,7 +34,7 @@
       </p>
     </div>
     <canvas id="simulation"></canvas>
-    <div id="timeline"></div>
+    <div id="controls"></div>
     <script>
         window.DATA = {{study_json}};
         {{simulation_js}}
