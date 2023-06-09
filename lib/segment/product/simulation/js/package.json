@@ -21,6 +21,8 @@
     "vue": "^3.2.45"
   },
   "dependencies": {
-    "@rollup/plugin-replace": "^5.0.2"
+    "@rollup/plugin-replace": "^5.0.2",
+    "luxon": "^3.3.0",
+    "moment": "^2.29.4"
   }
 }

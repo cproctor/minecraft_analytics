@@ -1,9 +1,9 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
 
 const props = defineProps(['playing', 'duration', 't'])
 const emit = defineEmits(['pause', 'seek', 'play'])
-const height = ref(100)
+const height = ref(80)
 const width = ref(100)
 const playHeadPosition = computed(() => width.value * (props.t / props.duration))
 const playingBeforeMouseDown = ref(props.playing)
@@ -54,19 +54,26 @@ function handleMouseleave(evt) {
   */
 }
 
+const playHeadStyle = reactive({
+  transform: 'translate(' + playHeadPosition + ', 0)'
+})
+
 </script>
 
 <template>
   <div id="timeline">
-    <svg width="90%" :height="height">
-      <rect id="timeline-rect" x="0" y="0" height="100" width="100%" 
+    <svg width="100%" :height="height">
+      <rect id="timeline-rect" x="0" y="0" height="100%" width="100%" 
        @mousedown="handleMousedown" 
        @mouseup="handleMouseup" 
        @mousemove="handleMousemove"
        @mouseenter="handleMouseenter" 
        @mouseleave="handleMouseleave" 
       />
-      <line id="play-head" :x1="playHeadPosition" y1="0" :x2="playHeadPosition" :y2="height" />
+      <g id="play-head" :style="playHeadStyle">
+        <line :x1="playHeadPosition" y1="0" :x2="playHeadPosition" :y2="height" />
+        <circle :cx="playHeadPosition" cy="0" r="6" />
+      </g>
     </svg>
   </div>
 </template>
@@ -74,17 +81,22 @@ function handleMouseleave(evt) {
 <style>
 #timeline {
   flex: 1 1;
+  padding: 25px;
 }
-svg {
-  transform: translate(25px, 25px);
+#timeline svg {
 }
-svg rect {
+#timeline svg rect {
   stroke-width: 1px;
   stroke: black;
-  fill: white;
+  fill: #ecf0f1;
+  cursor: grab;
 }
 #play-head {
+  stroke: #e74c3c;
+  fill: #e74c3c;
+  cursor: grab;
+}
+#play-head line {
   stroke-width: 2px;
-  stroke: red;
 }
 </style>
