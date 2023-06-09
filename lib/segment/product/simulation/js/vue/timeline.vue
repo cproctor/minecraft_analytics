@@ -20,12 +20,14 @@ function measureWidth() {
 }
 
 function handleMousedown(evt) {
+  console.log("mousedown")
   playingBeforeMouseDown.value = props.playing
   if (props.playing) emit('pause')
   scrubbing.value = true
   seekAtMouseX(evt)
 }
 function handleMouseup(evt) {
+  console.log("mouseup")
   if (scrubbing.value) {
     scrubbing.value = false
     if (playingBeforeMouseDown.value) {
@@ -34,43 +36,42 @@ function handleMouseup(evt) {
   }
 }
 function handleMousemove(evt) {
+  console.log("mousemove")
   if (scrubbing.value) seekAtMouseX(evt)
 }
 function seekAtMouseX(evt) {
-  const relativeMouseX = evt.clientX - evt.target.getBoundingClientRect().left
+  const rect = document.getElementById("timeline-rect")
+  const relativeMouseX = evt.clientX - rect.getBoundingClientRect().left
   const tScrub = props.duration * (relativeMouseX / width.value)
   emit('seek', tScrub)
 }
 function handleMouseenter(evt) {
+  console.log("mouseenter")
 }
 function handleMouseleave(evt) {
-  /*
+  console.log("mouseleave")
   if (scrubbing.value) {
     scrubbing.value = false
     if (playingBeforeMouseDown.value) {
       emit('play')
     }
   }
-  */
 }
-
-const playHeadStyle = reactive({
-  transform: 'translate(' + playHeadPosition + ', 0)'
-})
 
 </script>
 
 <template>
   <div id="timeline">
-    <svg width="100%" :height="height">
-      <rect id="timeline-rect" x="0" y="0" height="100%" width="100%" 
-       @mousedown="handleMousedown" 
-       @mouseup="handleMouseup" 
-       @mousemove="handleMousemove"
-       @mouseenter="handleMouseenter" 
-       @mouseleave="handleMouseleave" 
-      />
-      <g id="play-head" :style="playHeadStyle">
+    <svg width="100%" :height="height"
+      :class="{ scrubbing: scrubbing }"
+      @mousedown="handleMousedown" 
+      @mouseup="handleMouseup" 
+      @mousemove="handleMousemove"
+      @mouseenter="handleMouseenter" 
+      @mouseleave="handleMouseleave" 
+    >
+      <rect id="timeline-rect" x="0" y="0" height="100%" width="100%" />
+      <g id="play-head">
         <line :x1="playHeadPosition" y1="0" :x2="playHeadPosition" :y2="height" />
         <circle :cx="playHeadPosition" cy="0" r="6" />
       </g>
@@ -89,8 +90,12 @@ const playHeadStyle = reactive({
   stroke-width: 1px;
   stroke: black;
   fill: #ecf0f1;
-  cursor: grab;
+  cursor: pointer;
 }
+#timeline svg.scrubbing, #timeline svg.scrubbing rect, svg.scrubbing #play-head {
+  cursor: grabbing;
+}
+
 #play-head {
   stroke: #e74c3c;
   fill: #e74c3c;
