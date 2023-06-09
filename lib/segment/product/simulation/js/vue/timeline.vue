@@ -1,13 +1,23 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const props = defineProps(['playing', 'duration', 't'])
 const emit = defineEmits(['pause', 'seek', 'play'])
 const height = ref(100)
-const width = ref(400)
+const width = ref(100)
 const playHeadPosition = computed(() => width.value * (props.t / props.duration))
 const playingBeforeMouseDown = ref(props.playing)
 const scrubbing = ref(false)
+
+onMounted(() => {
+  measureWidth()
+  window.addEventListener('resize', measureWidth) 
+})
+
+function measureWidth() {
+  const rect = document.getElementById("timeline-rect")
+  width.value = rect.getBoundingClientRect().width
+}
 
 function handleMousedown(evt) {
   playingBeforeMouseDown.value = props.playing
@@ -34,21 +44,22 @@ function seekAtMouseX(evt) {
 function handleMouseenter(evt) {
 }
 function handleMouseleave(evt) {
-  console.log("LEAVE")
+  /*
   if (scrubbing.value) {
     scrubbing.value = false
     if (playingBeforeMouseDown.value) {
       emit('play')
     }
   }
+  */
 }
 
 </script>
 
 <template>
   <div id="timeline">
-    <svg width="600px" :height="height">
-      <rect x="0" y="0" height="100" width="400" 
+    <svg width="90%" :height="height">
+      <rect id="timeline-rect" x="0" y="0" height="100" width="100%" 
        @mousedown="handleMousedown" 
        @mouseup="handleMouseup" 
        @mousemove="handleMousemove"

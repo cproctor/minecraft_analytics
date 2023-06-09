@@ -1,7 +1,7 @@
 <script setup>
 import PlayButton from './play_button.vue'
 import Timeline from './timeline.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const playing = ref(true)
 const beginDate = ref(new Date(window.DATA.params.timespan[0]))
@@ -13,6 +13,10 @@ const t = ref(0)
 const speed = ref(5)
 const lastFrameTime = ref(undefined)
 const ended = computed(() => t.value == duration.value)
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
 
 function play() {
   playing.value = true
@@ -67,8 +71,8 @@ function updateSim() {
   window.sim.seek(seekDate)
 }
 
-function handleKeyup(evt) {
-  if (evt.code == 'Space') {
+function handleKeydown(evt) {
+  if (evt.key === ' ') {
     togglePlaying()
   }
 }
@@ -78,7 +82,7 @@ if (playing.value) animateSim()
 </script>
 
 <template>
-  <div id="inner-controls" @keyup="handleKeyup">
+  <div id="inner-controls">
     <PlayButton :playing="playing" :ended="ended" @toggle-playing="togglePlaying" />
     <Timeline :playing="playing" :duration="duration" :t="t" 
       @play="play"
