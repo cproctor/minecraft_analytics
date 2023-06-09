@@ -19,5 +19,8 @@
     "three": "^0.148.0",
     "three-orbit-controls": "^82.1.0",
     "vue": "^3.2.45"
+  },
+  "dependencies": {
+    "@rollup/plugin-replace": "^5.0.2"
   }
 }

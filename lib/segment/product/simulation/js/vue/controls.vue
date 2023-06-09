@@ -1,7 +1,7 @@
 <script setup>
 import PlayButton from './play_button.vue'
 import Timeline from './timeline.vue'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const playing = ref(true)
 const beginDate = ref(new Date(window.DATA.params.timespan[0]))
@@ -9,38 +9,68 @@ const duration = ref(
   Date.parse(window.DATA.params.timespan[1]) - 
   Date.parse(window.DATA.params.timespan[0])
 )
-const playHead = ref(0)
-const speed = ref(1)
-const latestAnimationFrameTime = ref(new Date())
+const t = ref(0) 
+const speed = ref(5)
+const lastFrameTime = ref(undefined)
+const ended = computed(() => t.value == duration.value)
+
+function play() {
+  playing.value = true
+  animateSim()
+}
+function pause() {
+  playing.value = false
+}
+function seek(tSeek) {
+  t.value = tSeek
+  updateSim()
+}
 
 function togglePlaying() {
-  playing.value = !playing.value
-  if (playing.value) animateSim()
+  if (playing.value) {
+    pause()
+  } else {
+    if (t.value == duration.value) t.value = 0
+    play()
+  }
 }
 
 function animateSim() {
-  latestAnimationFrameTime.value = new Date()
-  requestAnimationFrame(animationLoop)
-}
-
-// Doesn't currently invoke the sim. IS something wrong with the if-statement conditions?
-function animationLoop() {
-  const currentTime = new Date()
-  const elapsed = speed.value * (currentTime.getTime() - latestAnimationFrameTime.value.getTime())
-  if (playHead.value + elapsed > duration.value) {
-    window.sim.seek(new Date(beginDate.value.getTime() + playHead.value))
-    playHead.value = duration.value
-    playing.value = false
-  }
-  else if (playHead.value + elapsed < 0) {
-    window.sim.seek(beginDate.value)
-    playHead.value = 0
-    playing.value = false
+  if (lastFrameTime.value === undefined) {
+    lastFrameTime.value = new Date()
   }
   else {
-    playHead.value += elapsed
+    const now = new Date()
+    const elapsed = speed.value * (now.getTime() - lastFrameTime.value.getTime())
+    if (t.value + elapsed > duration.value) {
+      t.value = duration.value
+      playing.value = false
+    }
+    else if (t.value + elapsed < 0) {
+      t.value = 0
+      playing.value = false
+    }
+    else {
+      t.value += elapsed
+    }
+    updateSim()
   }
-  if (playing.value) requestAnimationFrame(animationLoop)
+  if (playing.value) {
+    requestAnimationFrame(animateSim)
+  } else {
+    lastFrameTime.value = undefined
+  }
+}
+
+function updateSim() {
+  const seekDate = new Date(beginDate.value.getTime() + t.value)
+  window.sim.seek(seekDate)
+}
+
+function handleKeyup(evt) {
+  if (evt.code == 'Space') {
+    togglePlaying()
+  }
 }
 
 if (playing.value) animateSim()
@@ -48,9 +78,18 @@ if (playing.value) animateSim()
 </script>
 
 <template>
-  <PlayButton :playing="playing" @toggle-playing="togglePlaying" />
-  <Timeline />
+  <div id="inner-controls" @keyup="handleKeyup">
+    <PlayButton :playing="playing" :ended="ended" @toggle-playing="togglePlaying" />
+    <Timeline :playing="playing" :duration="duration" :t="t" 
+      @play="play"
+      @pause="pause"
+      @seek="seek"
+    />
+  </div>
 </template>
 
 <style>
+#inner-controls {
+  display: flex;
+}
 </style>
