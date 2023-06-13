@@ -10,7 +10,7 @@ const duration = ref(
   Date.parse(window.DATA.params.timespan[0])
 )
 const t = ref(0) 
-const speed = ref(5)
+const speed = ref(0.001)
 const lastFrameTime = ref(undefined)
 const ended = computed(() => t.value == duration.value)
 

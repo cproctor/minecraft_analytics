@@ -51,7 +51,8 @@ class SegmentSimulation(SegmentLogs):
     world_height = 256
 
     def export(self):
-        self.generate_study_data_json()
+        if not (self.params.get("use_cache", True) and self.get_cached_study_data_path().exists()):
+            self.generate_study_data_json()
         run('npm run build', cwd=self.here / 'js', shell=True)
         env = Environment(loader=FileSystemLoader(self.template_dir))
         template = env.get_template(self.template)
@@ -67,8 +68,6 @@ class SegmentSimulation(SegmentLogs):
                 }))
 
     def generate_study_data_json(self):
-        if self.params.get("use_cache", True) and self.get_cached_study_data_path().exists():
-            return
         world = MinecraftWorldView(
             self.initial_production_mca_path,
             self.main_log_file,
