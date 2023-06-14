@@ -62,7 +62,7 @@ class SegmentJointAttention(SegmentLogs):
         else:
             raise ValueError("Unsupported measure: {}".format(self.params['measure']))
 
-    def export_joint_attention_schneider_pea_2013(self):
+    def get_joint_attention_schneider_pea_2013_df(self):
         ws = self.params.get('window_seconds', self.default_window_seconds)
         dt = self.params.get('distance_threshold', self.default_distance_threshold)
         df = self.get_segment_data()
@@ -74,6 +74,10 @@ class SegmentJointAttention(SegmentLogs):
             col = p0 + '-' + p1
             lgdf[col] = joint_attention_schneider_pea_2013(lgdf, p0, p1, distance_threshold=dt, window_seconds=ws)
         result = self.trim_df(lgdf)
+        return result
+
+    def export_joint_attention_schneider_pea_2013(self):
+        result = self.get_joint_attention_schneider_pea_2013_df()
         result.to_csv(self.export_filename())
         if self.params.get('plot_filename'):
             figfile = self.export_filename('plot_filename')

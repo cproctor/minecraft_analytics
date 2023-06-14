@@ -13,8 +13,10 @@ import json
 from hashlib import md5
 from base64 import b64encode
 from collections import defaultdict
+from itertools import combinations
 from datetime import timedelta
 from segment.product.simulation.mc_world import MinecraftWorldView
+from segment.product.joint_attention import SegmentJointAttention
 
 def tuples(iterator):
     """Yields pairs of items.
@@ -40,7 +42,9 @@ class SegmentSimulation(SegmentLogs):
     optional_params = [
         "title",
         "use_cache",
-        "debug",
+        "lookback",
+        "distance_threshold",
+        "window_seconds",
     ]
 
     here = Path(__file__).parent
@@ -94,9 +98,34 @@ class SegmentSimulation(SegmentLogs):
         else:
             raise ValueError(f"Invalid players layer arg: {p_param}")
         data['layers']['players'] = p_layer
+        if 'jva' in self.params['layers'].keys():
+            player_list = p_layer['initial'].keys()
+            data['layers']['jva'] = self.get_jva_layer(player_list)
         with open(self.get_cached_study_data_path(), 'w') as fh:
             json.dump(data, fh)
 
+    def get_jva_layer(self, players):
+        jva_params = {k:v for k, v in self.params.items() if k in 
+                SegmentJointAttention.optional_params}
+        jva_params['format'] = "joint_attention"
+        jva_params['export_filename'] = '_'
+        jva_params['players'] = {p:p for p in players}
+        jva_params['measure'] = "joint_attention_schneider_pea_2013"
+        jva_product = SegmentJointAttention(self.segment_params, jva_params)
+        df = jva_product.get_joint_attention_schneider_pea_2013_df()
+        jva_cols = [f"{a}-{b}" for a, b in combinations(sorted(players), 2)]
+        df = df[jva_cols]
+        initial = {k: bool(v) for k, v in dict(df.iloc[0]).items()} # Yikes.
+        ops = {col: [] for col in jva_cols}
+        for col, oplist in ops.items():
+            # This is ugly. How to iterate Series with indices?
+            for ts, val in df[[col]].iterrows():
+                current = val[col]
+                prior = oplist[-1][2] if len(oplist) else initial[col]
+                if current != prior:
+                    oplist.append([str(ts), bool(prior), bool(current)])
+        return {"type": "jva", "initial": initial, "ops": ops}
+        
     def filter_players_df(self, df):
         start = self.segment_params['start']
         end = start + timedelta(seconds=self.segment_params['duration'])
