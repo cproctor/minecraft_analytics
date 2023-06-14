@@ -98,7 +98,7 @@ class SegmentSimulation(SegmentLogs):
         else:
             raise ValueError(f"Invalid players layer arg: {p_param}")
         data['layers']['players'] = p_layer
-        if 'jva' in self.params['layers'].keys():
+        if self.params['layers'].get('jva'):
             player_list = p_layer['initial'].keys()
             data['layers']['jva'] = self.get_jva_layer(player_list)
         with open(self.get_cached_study_data_path(), 'w') as fh:
@@ -113,18 +113,38 @@ class SegmentSimulation(SegmentLogs):
         jva_params['measure'] = "joint_attention_schneider_pea_2013"
         jva_product = SegmentJointAttention(self.segment_params, jva_params)
         df = jva_product.get_joint_attention_schneider_pea_2013_df()
-        jva_cols = [f"{a}-{b}" for a, b in combinations(sorted(players), 2)]
-        df = df[jva_cols]
-        initial = {k: bool(v) for k, v in dict(df.iloc[0]).items()} # Yikes.
-        ops = {col: [] for col in jva_cols}
-        for col, oplist in ops.items():
-            # This is ugly. How to iterate Series with indices?
-            for ts, val in df[[col]].iterrows():
-                current = val[col]
-                prior = oplist[-1][2] if len(oplist) else initial[col]
-                if current != prior:
-                    oplist.append([str(ts), bool(prior), bool(current)])
+        player_pairs = list(combinations(sorted(players), 2))
+        initial = {f"{p0}-{p1}": self.row_to_jva_state(df.iloc[0], p0, p1) for p0, p1 in player_pairs}
+        ops = {f"{p0}-{p1}": self.player_pair_ops(df, p0, p1) for p0, p1 in player_pairs}
         return {"type": "jva", "initial": initial, "ops": ops}
+
+    def player_pair_ops(self, df, p0, p1):
+        ops = []
+        for (ts0, row0), (ts1, row1) in tuples(df.iterrows()):
+            if row0[f"{p0}-{p1}"] or row1[f"{p0}-{p1}"]:
+                ops.append([
+                    str(ts1),
+                    self.row_to_jva_state(row0, p0, p1),
+                    self.row_to_jva_state(row1, p0, p1)
+                ])
+        return ops
+
+    def row_to_jva_state(self, row, player0, player1):
+        """Given a df produced by SegmentJointAttention, returns a 4-tuple
+        (jva_bool, x, y, z), indicating the shared gaze point of the players
+        if they have JVA.
+        .Zora299629_target_block_x'
+        """
+        jva_bool = bool(row[f"{player0}-{player1}"])
+        if jva_bool:
+            jva_x = (row[f"{player0}_target_block_x"] + row[f"{player1}_target_block_x"]) / 2
+            jva_y = (row[f"{player0}_target_block_y"] + row[f"{player1}_target_block_y"]) / 2
+            jva_z = (row[f"{player0}_target_block_z"] + row[f"{player1}_target_block_z"]) / 2
+        else:
+            jva_x = 0
+            jva_y = 0
+            jva_z = 0
+        return [jva_bool, jva_x, jva_y, jva_z]
         
     def filter_players_df(self, df):
         start = self.segment_params['start']
@@ -169,6 +189,8 @@ class SegmentSimulation(SegmentLogs):
             "ops": ops
         }
 
+    # TODO: This is wildly inefficient. I don't want no-op ops.
+    # Could be easily simplified by filtering out ops where before and after are identical.
     def get_player_ops(self, df):
         ops = []
         for (ts0, row0), (ts1, row1) in tuples(df.iterrows()):
