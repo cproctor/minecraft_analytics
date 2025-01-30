@@ -100,9 +100,25 @@ as shown below.
 
 ![Joint visual attention plot](figures/w1g1_joint_attention.png)
 
+Supported products are listed below. Consult each product for expected params.
+
+- transcript
+- audio
+- video
+- logs
+- trace
+- joint_attention
+- cross_recurrence
+- cross_recurrence_augmented
+- simulation
+
 Finally, an **analysis** performs a calculation with one or more products. For example, each of the 
 research questions in Proctor & Muller (2022) is implemented as an analysis.
 The parameters for products and analyses are specified in yaml files. 
+Supported models:
+
+- jva-collaboration
+- jva-multimodal
 
 ## TODO
 
