@@ -122,11 +122,10 @@ class SegmentSimulation(SegmentLogs):
         ops = []
         for (ts0, row0), (ts1, row1) in tuples(df.iterrows()):
             if row0[f"{p0}-{p1}"] or row1[f"{p0}-{p1}"]:
-                ops.append([
-                    str(ts1),
-                    self.row_to_jva_state(row0, p0, p1),
-                    self.row_to_jva_state(row1, p0, p1)
-                ])
+                s0 = self.row_to_jva_state(row0, p0, p1)
+                s1 = self.row_to_jva_state(row1, p0, p1)
+                if not (s0[1] == s1[1] and s0[2] == s1[2] and s0[3] == s1[3]):
+                    ops.append([str(ts1), s0, s1])
         return ops
 
     def row_to_jva_state(self, row, player0, player1):
@@ -144,7 +143,7 @@ class SegmentSimulation(SegmentLogs):
             jva_x = 0
             jva_y = 0
             jva_z = 0
-        return [jva_bool, jva_x, jva_y, jva_z]
+        return (jva_bool, jva_x, jva_y, jva_z)
         
     def filter_players_df(self, df):
         start = self.segment_params['start']

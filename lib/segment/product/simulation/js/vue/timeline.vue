@@ -20,14 +20,12 @@ function measureWidth() {
 }
 
 function handleMousedown(evt) {
-  console.log("mousedown")
   playingBeforeMouseDown.value = props.playing
   if (props.playing) emit('pause')
   scrubbing.value = true
   seekAtMouseX(evt)
 }
 function handleMouseup(evt) {
-  console.log("mouseup")
   if (scrubbing.value) {
     scrubbing.value = false
     if (playingBeforeMouseDown.value) {
@@ -36,7 +34,6 @@ function handleMouseup(evt) {
   }
 }
 function handleMousemove(evt) {
-  console.log("mousemove")
   if (scrubbing.value) seekAtMouseX(evt)
 }
 function seekAtMouseX(evt) {
@@ -46,10 +43,8 @@ function seekAtMouseX(evt) {
   emit('seek', tScrub)
 }
 function handleMouseenter(evt) {
-  console.log("mouseenter")
 }
 function handleMouseleave(evt) {
-  console.log("mouseleave")
   if (scrubbing.value) {
     scrubbing.value = false
     if (playingBeforeMouseDown.value) {
